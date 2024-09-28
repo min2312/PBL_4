@@ -2,6 +2,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <ESP8266WiFi.h>
 #include <WebSocketsServer.h>
+#include <Servo.h> 
 
 const char* ssid = "Quang Minh";
 const char* password = "khongcanbiet";
@@ -10,12 +11,17 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
 String licensePlate = "";
-
+Servo myServo;
+int servoPin = D4;
 void setup() {
   Serial.begin(115200);  
   // Khởi động LCD
   lcd.init();          
   lcd.backlight();     
+
+  // Khởi động servo
+  myServo.attach(servoPin);
+  myServo.write(0); 
 
   // Kết nối WiFi
   WiFi.begin(ssid, password);
@@ -42,6 +48,10 @@ void loop() {
     lcd.print("Chao mung!");
     lcd.setCursor((16 - licensePlate.length()) / 2, 1);
     lcd.print(licensePlate);
+    myServo.write(90); 
+    delay(5000);
+    myServo.write(0);
+    licensePlate = ""; 
     delay(5000);
   }
 }
