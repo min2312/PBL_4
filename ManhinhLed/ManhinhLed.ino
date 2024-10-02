@@ -4,8 +4,8 @@
 #include <WebSocketsServer.h>
 #include <Servo.h> 
 
-const char* ssid = "Quang Minh";
-const char* password = "khongcanbiet";
+const char* ssid = "Toanlake";
+const char* password = "123456789";
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 WebSocketsServer webSocket = WebSocketsServer(81);
@@ -52,7 +52,7 @@ void loop() {
     delay(5000);
     myServo.write(0);
     licensePlate = ""; 
-    delay(5000);
+    delay(3000);
   }
 }
 

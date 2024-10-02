@@ -4,15 +4,15 @@ import urllib.request
 from src.lp_recognition import E2E
 import websocket
 
-url = 'http://192.168.1.10/cam-lo.jpg'
+url = 'http://192.168.43.70/cam-hi.jpg'
 model = E2E()
 
 # Kết nối đến WebSocket của ESP8266
-ws = websocket.create_connection("ws://192.168.1.4:81")  # Địa chỉ IP của ESP8266
+ws = websocket.create_connection("ws://192.168.43.110:81")  # Địa chỉ IP của ESP8266
 
 previous_plate = ""
 count = 0
-required_count = 5  # Cần nhận diện giống nhau 5 lần
+required_count = 5 
 
 while True:
     img_resp = urllib.request.urlopen(url)
