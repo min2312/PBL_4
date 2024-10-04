@@ -1,0 +1,42 @@
+body {
+	background: linear-gradient(
+		90deg,
+		rgb(2, 0, 36) 0%,
+		rgb(75, 14, 154) 35%,
+		rgb(0, 212, 255) 100%
+	);
+}
+
+form {
+	width: 24%;
+	background-color: white;
+	padding: 50px;
+	border-radius: 20px;
+	margin-top: 150px;
+}
+.btn-primary {
+	width: 100%;
+	border: none;
+	border-radius: 50px;
+	background: linear-gradient(
+		90deg,
+		rgb(2, 0, 36) 0%,
+		rgb(75, 14, 154) 35%,
+		rgb(0, 212, 255) 100%
+	);
+}
+.form-control {
+	color: black;
+	border-bottom-color: black;
+	box-shadow: none !important;
+	border: none;
+	border-bottom: 1px solid;
+	border-radius: 4px 4px 0 0;
+}
+h4 {
+	font-size: 2rem !important;
+	font-weight: 700;
+}
+.form-label {
+	font-family: 800 !important;
+}
