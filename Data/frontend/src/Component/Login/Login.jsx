@@ -1,6 +1,11 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 import "./login.css";
 const Login = () => {
+	let history = useHistory();
+	const HandleCreateAccount = () => {
+		history.push("/register");
+	};
 	return (
 		<section className="section_login">
 			<div className="container-fluid">
@@ -49,7 +54,10 @@ const Login = () => {
 								Login
 							</button>
 							<hr />
-							<button className="btn btn-success content-center mb-3">
+							<button
+								className="btn btn-success content-center mb-3"
+								onClick={() => HandleCreateAccount()}
+							>
 								Create New Account
 							</button>
 						</form>

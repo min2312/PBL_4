@@ -1,8 +1,13 @@
 import React from "react";
-import "./login.css";
-const Login = () => {
+import { useHistory } from "react-router-dom";
+import "./register.css";
+const Register = () => {
+	let history = useHistory();
+	const HandleLogin = () => {
+		history.push("/login");
+	};
 	return (
-		<section className="section_login">
+		<section className="section_register">
 			<div className="container-fluid">
 				<div className="row">
 					<div className="col-7 content-left">
@@ -14,9 +19,18 @@ const Login = () => {
 							consequuntur libero eveniet expedita.
 						</div>
 					</div>
-					<div className="col-4 content-right login-form">
+					<div className="col-4 content-right register-form">
 						<form className="mx-auto d-flex flex-column">
-							<h4 className="text-center">Login</h4>
+							<h4 className="text-center">Register</h4>
+							<div className="form-group mb-3 mt-2">
+								<label className="form-label">FullName:</label>
+								<input
+									type="email"
+									className="form-control"
+									id="FullName"
+									placeholder="Enter FullName"
+								/>
+							</div>
 							<div className="form-group mb-3 mt-2">
 								<label for="exampleInputEmail1" className="form-label">
 									Email address
@@ -39,19 +53,17 @@ const Login = () => {
 									id="exampleInputPassword1"
 									placeholder="Password"
 								/>
-								<div id="emailHelp" class="form-text text-center">
-									<a href="#" className="forget_pass">
-										Forget password?
-									</a>
-								</div>
 							</div>
 							<button type="submit" className="btn btn-primary mt-3">
-								Login
+								Register
 							</button>
 							<hr />
-							<button className="btn btn-success content-center mb-3">
-								Create New Account
-							</button>
+							<label className=" label">
+								Already've an account.{" "}
+								<a href="" onClick={() => HandleLogin()}>
+									Login
+								</a>
+							</label>
 						</form>
 					</div>
 				</div>
@@ -60,4 +72,4 @@ const Login = () => {
 	);
 };
 
-export default Login;
+export default Register;
