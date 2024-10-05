@@ -1,10 +1,62 @@
-import React from "react";
+import { useState, React } from "react";
 import { useHistory } from "react-router-dom";
 import "./login.css";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { LoginUser } from "../../services/userService";
 const Login = () => {
 	let history = useHistory();
+	const [formValues, setFormValues] = useState({
+		email: "",
+		password: "",
+	});
+	const defaultobjvalidinput = {
+		isValidLogin: true,
+		isValidPass: true,
+	};
+	const [objvalidinput, setObjvalidinput] = useState(defaultobjvalidinput);
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setFormValues({
+			...formValues,
+			[name]: value,
+		});
+	};
 	const HandleCreateAccount = () => {
 		history.push("/register");
+	};
+	const HandleLogin = async (e) => {
+		e.preventDefault();
+		setObjvalidinput(defaultobjvalidinput);
+		if (!formValues.email && !formValues.password) {
+			setObjvalidinput({
+				...defaultobjvalidinput,
+				isValidLogin: false,
+				isValidPass: false,
+			});
+			toast.error("Please fill in your email and password");
+			return;
+		}
+		if (!formValues.email) {
+			setObjvalidinput({ ...defaultobjvalidinput, isValidLogin: false });
+			toast.error("Please fill in your email");
+			return;
+		}
+		if (!formValues.password) {
+			setObjvalidinput({ ...defaultobjvalidinput, isValidPass: false });
+			toast.error("Please fill in your password");
+		}
+		try {
+			const response = await LoginUser(formValues);
+			console.log(response);
+			if (response && response.errcode === 0) {
+				history.push("/");
+			} else {
+				toast.error(response.message);
+			}
+		} catch (e) {
+			toast.error("Login failed. Please try again.");
+		}
 	};
 	return (
 		<section className="section_login">
@@ -28,8 +80,15 @@ const Login = () => {
 								</label>
 								<input
 									type="email"
-									className="form-control"
+									className={
+										objvalidinput.isValidLogin
+											? "form-control"
+											: "is-invalid form-control"
+									}
 									id="exampleInputEmail1"
+									name="email"
+									value={formValues.email}
+									onChange={handleInputChange}
 									aria-describedby="emailHelp"
 									placeholder="Enter email"
 								/>
@@ -40,17 +99,28 @@ const Login = () => {
 								</label>
 								<input
 									type="password"
-									className="form-control"
+									className={
+										objvalidinput.isValidPass
+											? "form-control"
+											: "is-invalid form-control"
+									}
 									id="exampleInputPassword1"
+									name="password"
+									value={formValues.password}
+									onChange={handleInputChange}
 									placeholder="Password"
 								/>
-								<div id="emailHelp" class="form-text text-center">
+								<div id="emailHelp" className="form-text text-center">
 									<a href="#" className="forget_pass">
 										Forget password?
 									</a>
 								</div>
 							</div>
-							<button type="submit" className="btn btn-primary mt-3">
+							<button
+								type="submit"
+								className="btn btn-primary mt-3"
+								onClick={HandleLogin}
+							>
 								Login
 							</button>
 							<hr />
