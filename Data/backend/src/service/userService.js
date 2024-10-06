@@ -31,7 +31,7 @@ let HandleUserLogin = (email, password) => {
 				}
 			} else {
 				userData.errCode = 1;
-				userData.errMessage = `Yours's Email isn't exist in your system. Plz try other Email`;
+				userData.errMessage = `Yours's Email or Password is incorrect!`;
 			}
 			resolve(userData);
 		} catch (e) {
