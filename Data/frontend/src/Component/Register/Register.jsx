@@ -41,6 +41,7 @@ const Register = () => {
 			const response = await CreateNewUser(formValues);
 			console.log(response);
 			if (response && response.errCode === 0) {
+				toast.success("Success Register");
 				history.push("/login");
 			} else {
 				toast.error(response.errMessage);

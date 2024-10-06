@@ -48,9 +48,14 @@ const Login = () => {
 		}
 		try {
 			const response = await LoginUser(formValues);
-			console.log(response);
 			if (response && response.errcode === 0) {
-				history.push("/");
+				toast.success("Success Login");
+				let data = {
+					isAuthenticated: true,
+					token: "fake token",
+				};
+				window.sessionStorage.setItem("abc", JSON.stringify(data));
+				history.push("/users");
 			} else {
 				toast.error(response.message);
 			}
