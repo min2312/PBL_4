@@ -39,7 +39,6 @@ const Register = () => {
 		}
 		try {
 			const response = await CreateNewUser(formValues);
-			console.log(response);
 			if (response && response.errCode === 0) {
 				toast.success("Success Register");
 				history.push("/login");
@@ -47,7 +46,8 @@ const Register = () => {
 				toast.error(response.errMessage);
 			}
 		} catch (e) {
-			toast.error("Login failed. Please try again.");
+			toast.error("Register failed. Please try again.");
+			console.log(e);
 		}
 	};
 

@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios from "../setup/axios";
 const LoginUser = (data) => {
 	return axios
-		.post("http://localhost:8081/api/login", data)
+		.post("/api/login", data)
 		.then((response) => {
 			return response.data;
 		})
@@ -12,7 +12,7 @@ const LoginUser = (data) => {
 
 const CreateNewUser = (data) => {
 	return axios
-		.post("http://localhost:8081/api/create-new-user", data)
+		.post("/api/create-new-user", data)
 		.then((response) => {
 			return response.data;
 		})
