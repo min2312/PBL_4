@@ -56,6 +56,7 @@ const Login = () => {
 				};
 				window.sessionStorage.setItem("abc", JSON.stringify(data));
 				history.push("/users");
+				window.location.reload();
 			} else {
 				toast.error(response.message);
 			}

@@ -17,7 +17,7 @@ const ClientRoute = () => {
 					<Register />
 				</Route>
 				<Route path="/users">users</Route>
-				<Route path="/">
+				<Route path="/" exact>
 					<Home />
 				</Route>
 				<Route path="*">404 Not Found</Route>
