@@ -3,6 +3,8 @@ import db from "../models/index";
 import bcrypt from "bcryptjs";
 import { where } from "sequelize";
 import { response } from "express";
+import { CreateJWT } from "../middleware/JWT_Action";
+require("dotenv").config();
 const salt = bcrypt.genSaltSync(10);
 let HandleUserLogin = (email, password) => {
 	return new Promise(async (resolve, reject) => {
@@ -17,13 +19,23 @@ let HandleUserLogin = (email, password) => {
 				if (user) {
 					let check = await bcrypt.compareSync(password, user.password);
 					if (check) {
+						let payload = {
+							id: user.id,
+							email: user.email,
+							fullName: user.fullName,
+							expiresin: process.env.JWT_Expires_In,
+						};
+						let token = CreateJWT(payload);
 						userData.errCode = 0;
 						userData.errMessage = `OK`;
 						delete user.password;
 						userData.user = user;
+						userData.DT = {
+							access_token: token,
+						};
 					} else {
 						userData.errCode = 3;
-						userData.errMessage = `Wrong Password`;
+						userData.errMessage = `Yours's Email or Password is incorrect!`;
 					}
 				} else {
 					userData.errCode = 2;
