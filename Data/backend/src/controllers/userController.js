@@ -10,7 +10,12 @@ let HandleLogin = async (req, res) => {
 	}
 
 	let userdata = await userService.HandleUserLogin(email, pass);
-	res.cookie("jwt", userdata.DT.access_token, { httpOnly: true });
+	if (userdata && userdata.DT && userdata.DT.access_token) {
+		res.cookie("jwt", userdata.DT.access_token, {
+			httpOnly: true,
+			maxAge: 60 * 60 * 1000,
+		});
+	}
 	return res.status(200).json({
 		errcode: userdata.errCode,
 		message: userdata.errMessage,

@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
+const nonSecurePaths = ["/api/login", "/api/create-new-user"];
+
 const CreateJWT = (payload) => {
 	let key = process.env.JWT_Secrect;
 	let token = null;
@@ -14,17 +16,40 @@ const CreateJWT = (payload) => {
 
 const verifyToken = (token) => {
 	let key = process.env.JWT_Secrect;
-	let data = null;
+	let decoded = null;
 	try {
-		let decoded = jwt.verify(token, key);
-		data = decoded;
+		decoded = jwt.verify(token, key);
 	} catch (e) {
 		console.log(e);
 	}
-	return data;
+	return decoded;
+};
+
+const checkUserJWT = (req, res, next) => {
+	if (nonSecurePaths.includes(req.path)) return next();
+	let cookies = req.cookies;
+	if (cookies && cookies.jwt) {
+		let token = cookies.jwt;
+		let decoded = verifyToken(token);
+		if (decoded) {
+			req.user = decoded;
+			next();
+		} else {
+			return res.status(401).json({
+				errCode: -1,
+				errMessage: "Not Authencated the user",
+			});
+		}
+	} else {
+		return res.status(401).json({
+			errCode: -1,
+			errMessage: "Not Authencated the user",
+		});
+	}
 };
 
 module.exports = {
 	CreateJWT,
 	verifyToken,
+	checkUserJWT,
 };
