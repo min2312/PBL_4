@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { GetAllUser } from "../../services/userService";
 import "../Users/users.css";
+import { UserContext } from "../../Context/UserProvider";
 const Users = () => {
 	const [users, setUsers] = useState([]);
+	const { user } = useContext(UserContext);
 	const GetData = async () => {
 		try {
-			const userData = window.sessionStorage.getItem("abc");
 			let id_User = "ALL";
-			if (userData) {
-				let parsedData = JSON.parse(userData);
-				id_User = parsedData.id;
+			if (user && user.isAuthenticated === true) {
+				id_User = user.account.id;
 			}
 			let respone = await GetAllUser(id_User);
 			if (respone && respone.errCode === 0) {

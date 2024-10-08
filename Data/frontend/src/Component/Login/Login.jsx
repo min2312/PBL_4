@@ -1,7 +1,6 @@
 import { useState, React, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import "./login.css";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { LoginUser } from "../../services/userService";
 import { UserContext } from "../../Context/UserProvider";
@@ -62,7 +61,6 @@ const Login = () => {
 				window.sessionStorage.setItem("abc", JSON.stringify(data));
 				loginContext(data);
 				history.push("/users");
-				// window.location.reload();
 			} else {
 				toast.error(response.message);
 			}
@@ -123,7 +121,7 @@ const Login = () => {
 									placeholder="Password"
 								/>
 								<div id="emailHelp" className="form-text text-center">
-									<a href="#" className="forget_pass">
+									<a href="/register" className="forget_pass">
 										Forget password?
 									</a>
 								</div>

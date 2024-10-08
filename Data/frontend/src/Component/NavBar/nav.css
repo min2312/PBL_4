@@ -33,3 +33,18 @@
 .NavDropdown {
 	margin-right: 50px;
 }
+.nav-link {
+	color: white;
+}
+.NavDropdown .dropdown-toggle:focus,
+.NavDropdown .dropdown-toggle:hover,
+.NavDropdown .dropdown-toggle:active {
+	color: white;
+}
+.NavDropdown .dropdown-item:hover {
+	background-color: #f0f0f0;
+	color: #ffc107;
+}
+.nav-link:hover {
+	color: #ffc107 !important;
+}
