@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import "../NavBar/nav.css";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Nav from "react-bootstrap/Nav";
 const NavBar = () => {
-	const history = useHistory();
 	const [isShow, setIsShow] = useState(false);
 	useEffect(() => {
 		let session = sessionStorage.getItem("abc");

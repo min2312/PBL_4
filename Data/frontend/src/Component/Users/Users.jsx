@@ -6,14 +6,21 @@ const Users = () => {
 	const [users, setUsers] = useState([]);
 	const GetData = async () => {
 		try {
-			let respone = await GetAllUser("ALL");
+			const userData = window.sessionStorage.getItem("abc");
+			let id_User = "ALL";
+			if (userData) {
+				let parsedData = JSON.parse(userData);
+				id_User = parsedData.id;
+			}
+			let respone = await GetAllUser(id_User);
 			if (respone && respone.errCode === 0) {
-				setUsers(respone.user);
+				setUsers([respone.user]);
 			} else {
 				toast.error("Get Data Failed");
 			}
 		} catch (e) {
 			toast.error("Get Data Failed");
+			console.log(e);
 		}
 	};
 	useEffect(() => {
@@ -56,7 +63,7 @@ const Users = () => {
 							users.length > 0 &&
 							users.map((item, index) => {
 								return (
-									<tr>
+									<tr key={index}>
 										<td>{index + 1}</td>
 										<td>{item.email}</td>
 										<td>{item.fullName}</td>

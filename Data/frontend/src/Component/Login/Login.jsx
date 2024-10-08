@@ -1,10 +1,12 @@
-import { useState, React } from "react";
+import { useState, React, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import "./login.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { LoginUser } from "../../services/userService";
+import { UserContext } from "../../Context/UserProvider";
 const Login = () => {
+	const { loginContext } = useContext(UserContext);
 	let history = useHistory();
 	const [formValues, setFormValues] = useState({
 		email: "",
@@ -50,13 +52,17 @@ const Login = () => {
 			const response = await LoginUser(formValues);
 			if (response && response.errcode === 0) {
 				toast.success("Success Login");
+				let token = response.DT.access_token;
 				let data = {
 					isAuthenticated: true,
-					token: "fake token",
+					token: token,
+					id: response.user.id,
+					account: response.user,
 				};
 				window.sessionStorage.setItem("abc", JSON.stringify(data));
+				loginContext(data);
 				history.push("/users");
-				window.location.reload();
+				// window.location.reload();
 			} else {
 				toast.error(response.message);
 			}
