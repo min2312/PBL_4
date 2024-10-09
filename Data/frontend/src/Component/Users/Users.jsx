@@ -10,17 +10,21 @@ const Users = () => {
 		try {
 			let id_User = "ALL";
 			if (user && user.isAuthenticated === true) {
-				id_User = user.account.id;
+				id_User = user.account.id || id_User;
 			}
 			let respone = await GetAllUser(id_User);
 			if (respone && respone.errCode === 0) {
-				setUsers([respone.user]);
+				if (Array.isArray(respone.user)) {
+					setUsers(respone.user);
+				} else {
+					setUsers([respone.user]);
+				}
 			} else {
 				toast.error("Get Data Failed");
 			}
 		} catch (e) {
 			toast.error("Get Data Failed");
-			console.log(e);
+			console.log("err:", e);
 		}
 	};
 	useEffect(() => {

@@ -8,9 +8,7 @@ const NavBar = () => {
 	const { user } = useContext(UserContext);
 	const location = useLocation();
 	const handleLogout = () => {
-		sessionStorage.removeItem("abc");
 		// setIsShow(false);
-		window.location.reload();
 	};
 	return (
 		<>

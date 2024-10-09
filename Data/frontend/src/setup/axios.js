@@ -34,37 +34,37 @@ instance.interceptors.response.use(
 		switch (status) {
 			// authentication (token related issues)
 			case 401: {
-				return Promise.reject(err);
+				return err.response.data;
 			}
 
 			// forbidden (permission related issues)
 			case 403: {
-				return Promise.reject(err);
+				return err.response.data;
 			}
 
 			// bad request
 			case 400: {
-				return Promise.reject(err);
+				return err.response.data;
 			}
 
 			// not found
 			case 404: {
-				return Promise.reject(err);
+				return err.response.data;
 			}
 
 			// conflict
 			case 409: {
-				return Promise.reject(err);
+				return err.response.data;
 			}
 
 			// unprocessable
 			case 422: {
-				return Promise.reject(err);
+				return err.response.data;
 			}
 
 			// generic api error (server related) unexpected
 			default: {
-				return Promise.reject(err);
+				return err.response.data;
 			}
 		}
 	}

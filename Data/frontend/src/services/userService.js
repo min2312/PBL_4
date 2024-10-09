@@ -30,4 +30,7 @@ const GetAllUser = (InputId) => {
 			console.log(err);
 		});
 };
-export { LoginUser, CreateNewUser, GetAllUser };
+const getUserAccount = () => {
+	return axios.get("/api/account");
+};
+export { LoginUser, CreateNewUser, GetAllUser, getUserAccount };

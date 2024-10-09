@@ -58,7 +58,6 @@ const Login = () => {
 					id: response.user.id,
 					account: response.user,
 				};
-				window.sessionStorage.setItem("abc", JSON.stringify(data));
 				loginContext(data);
 				history.push("/users");
 			} else {
