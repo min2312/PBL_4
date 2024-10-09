@@ -61,10 +61,24 @@ let HandleDeleteUser = async (req, res) => {
 		...message,
 	});
 };
+const getUserAccount = async (req, res) => {
+	return res.status(200).json({
+		errCode: 0,
+		errMessage: "Ok!",
+		DT: {
+			access_token: req.token,
+			id: req.user.id,
+			fullName: req.user.fullName,
+			email: req.user.email,
+		},
+	});
+};
+const HandleLogOut = (req, res) => {};
 module.exports = {
 	HandleLogin: HandleLogin,
 	HandleGetAllUser: HandleGetAllUser,
 	HandleCreateNewUser: HandleCreateNewUser,
 	HandleEditUser: HandleEditUser,
 	HandleDeleteUser: HandleDeleteUser,
+	getUserAccount,
 };

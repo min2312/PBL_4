@@ -23,7 +23,6 @@ let HandleUserLogin = (email, password) => {
 							id: user.id,
 							email: user.email,
 							fullName: user.fullName,
-							expiresin: process.env.JWT_Expires_In,
 						};
 						let token = CreateJWT(payload);
 						userData.errCode = 0;

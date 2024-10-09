@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
-const nonSecurePaths = ["/api/login", "/api/create-new-user"];
+const nonSecurePaths = ["/api/login", "/api/create-new-user", "/api/logout"];
 
 const CreateJWT = (payload) => {
 	let key = process.env.JWT_Secrect;
 	let token = null;
 	try {
-		token = jwt.sign(payload, key);
+		token = jwt.sign(payload, key, { expiresIn: process.env.JWT_Expires_In });
 	} catch (e) {
 		console.log(e);
 	}
@@ -33,6 +33,7 @@ const checkUserJWT = (req, res, next) => {
 		let decoded = verifyToken(token);
 		if (decoded) {
 			req.user = decoded;
+			req.token = token;
 			next();
 		} else {
 			return res.status(401).json({
