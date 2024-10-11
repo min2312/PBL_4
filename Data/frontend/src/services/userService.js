@@ -33,4 +33,7 @@ const GetAllUser = (InputId) => {
 const getUserAccount = () => {
 	return axios.get("/api/account");
 };
-export { LoginUser, CreateNewUser, GetAllUser, getUserAccount };
+const LogOutUser = () => {
+	return axios.post("/api/logout");
+};
+export { LoginUser, CreateNewUser, GetAllUser, getUserAccount, LogOutUser };

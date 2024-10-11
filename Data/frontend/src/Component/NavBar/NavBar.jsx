@@ -1,14 +1,28 @@
 import React, { useContext } from "react";
-import { Link, useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import {
+	Link,
+	useHistory,
+	useLocation,
+} from "react-router-dom/cjs/react-router-dom.min";
 import "../NavBar/nav.css";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Nav from "react-bootstrap/Nav";
 import { UserContext } from "../../Context/UserProvider";
+import { LogOutUser } from "../../services/userService";
+import { toast } from "react-toastify";
 const NavBar = () => {
-	const { user } = useContext(UserContext);
+	const { user, logoutContext } = useContext(UserContext);
+	const history = useHistory();
 	const location = useLocation();
-	const handleLogout = () => {
-		// setIsShow(false);
+	const handleLogout = async () => {
+		let data = await LogOutUser();
+		logoutContext();
+		if (data && data.errCode === 0) {
+			history.push("/");
+			toast.success("Log out success");
+		} else {
+			toast.error(data.errMessage);
+		}
 	};
 	return (
 		<>
