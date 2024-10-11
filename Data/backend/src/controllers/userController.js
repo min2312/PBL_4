@@ -73,7 +73,21 @@ const getUserAccount = async (req, res) => {
 		},
 	});
 };
-const HandleLogOut = (req, res) => {};
+const HandleLogOut = (req, res) => {
+	try {
+		res.clearCookie("jwt");
+		return res.status(200).json({
+			errCode: 0,
+			errMessage: "Clear cookie done",
+		});
+	} catch (e) {
+		console.log(e);
+		return res.status(500).json({
+			errCode: -1,
+			errMessage: "Error from server",
+		});
+	}
+};
 module.exports = {
 	HandleLogin: HandleLogin,
 	HandleGetAllUser: HandleGetAllUser,
@@ -81,4 +95,5 @@ module.exports = {
 	HandleEditUser: HandleEditUser,
 	HandleDeleteUser: HandleDeleteUser,
 	getUserAccount,
+	HandleLogOut: HandleLogOut,
 };

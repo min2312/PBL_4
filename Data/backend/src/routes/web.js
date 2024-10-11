@@ -6,7 +6,7 @@ let router = express.Router();
 let initWebRoutes = (app) => {
 	router.all("*", checkUserJWT);
 	router.post("/api/login", userController.HandleLogin);
-	router.post("/api/logout", userController.HandleLogin);
+	router.post("/api/logout", userController.HandleLogOut);
 	router.get("/api/get-all-user", userController.HandleGetAllUser);
 	router.get("/api/account", userController.getUserAccount);
 	router.put("/api/edit-user", userController.HandleEditUser);
