@@ -15,3 +15,8 @@
 .label {
 	color: gray;
 }
+.login {
+	color: rgb(112, 40, 247);
+	text-decoration: underline;
+	cursor: pointer;
+}

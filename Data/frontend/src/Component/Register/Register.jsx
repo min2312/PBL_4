@@ -1,18 +1,11 @@
 import { useState, React } from "react";
 import { useHistory } from "react-router-dom";
 import "./register.css";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { CreateNewUser } from "../../services/userService";
 
 const Register = () => {
 	let history = useHistory();
-	const defaultobjvalidinput = {
-		isValidFullName: true,
-		isValidEmail: true,
-		isValidPass: true,
-	};
-	const [objvalidinput, setObjvalidinput] = useState(defaultobjvalidinput);
 	const HandleLogin = () => {
 		history.push("/login");
 	};
@@ -21,6 +14,7 @@ const Register = () => {
 		fullName: "",
 		email: "",
 		password: "",
+		phone: "",
 	});
 
 	const handleInputChange = (e) => {
@@ -71,7 +65,7 @@ const Register = () => {
 						>
 							<h4 className="text-center">Register</h4>
 							<div className="form-group mb-3 mt-2">
-								<label className="form-label">FullName:</label>
+								<label className="form-label">Full Name:</label>
 								<input
 									type="text"
 									className="form-control"
@@ -80,6 +74,18 @@ const Register = () => {
 									value={formValues.fullName}
 									onChange={handleInputChange}
 									placeholder="Enter FullName"
+								/>
+							</div>
+							<div className="form-group mb-3 mt-2">
+								<label className="form-label">Phone Number:</label>
+								<input
+									type="text"
+									className="form-control"
+									id="PhoneNumber"
+									name="phone"
+									value={formValues.phone}
+									onChange={handleInputChange}
+									placeholder="Enter Phone Number"
 								/>
 							</div>
 							<div className="form-group mb-3 mt-2">
@@ -117,9 +123,9 @@ const Register = () => {
 							<hr />
 							<label className="label">
 								Already've an account.{" "}
-								<a href="" onClick={() => HandleLogin()}>
+								<span className="login" onClick={() => HandleLogin()}>
 									Login
-								</a>
+								</span>
 							</label>
 						</form>
 					</div>
