@@ -109,7 +109,7 @@ let CreateNewUser = (data) => {
 					email: data.email,
 					password: hashPasswordFromBcrypt,
 					fullName: data.fullName,
-					// Gender: data.gender == "1" ? true : false,
+					phone: data.phone,
 				});
 				resolve({
 					errCode: 0,
