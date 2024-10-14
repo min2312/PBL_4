@@ -36,4 +36,14 @@ const getUserAccount = () => {
 const LogOutUser = () => {
 	return axios.post("/api/logout");
 };
-export { LoginUser, CreateNewUser, GetAllUser, getUserAccount, LogOutUser };
+const EditUserService = (user_edit) => {
+	return axios.put("/api/edit-user", user_edit);
+};
+export {
+	LoginUser,
+	CreateNewUser,
+	GetAllUser,
+	getUserAccount,
+	LogOutUser,
+	EditUserService,
+};
