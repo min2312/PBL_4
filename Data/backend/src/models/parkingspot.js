@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false,
 			},
 			location: DataTypes.STRING,
-			status: DataTypes.STRING,
+			status: DataTypes.ENUM,
 		},
 		{
 			sequelize,

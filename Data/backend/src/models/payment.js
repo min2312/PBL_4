@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false,
 			},
 			method: DataTypes.STRING,
-			amount: DataTypes.FLOAT,
+			amount: DataTypes.INTEGER,
 			paymentDate: DataTypes.DATE,
 			id_reservation: DataTypes.INTEGER,
 		},
