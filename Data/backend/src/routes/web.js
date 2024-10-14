@@ -1,11 +1,13 @@
 import express from "express";
 import userController from "../controllers/userController";
+import adminController from "../controllers/adminController";
 import { checkUserJWT } from "../middleware/JWT_Action";
 let router = express.Router();
 
 let initWebRoutes = (app) => {
 	router.all("*", checkUserJWT);
 	router.post("/api/login", userController.HandleLogin);
+	router.post("/api/admin_login", adminController.HandleLoginAdmin);
 	router.post("/api/logout", userController.HandleLogOut);
 	router.get("/api/get-all-user", userController.HandleGetAllUser);
 	router.get("/api/account", userController.getUserAccount);
