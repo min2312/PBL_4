@@ -3,9 +3,14 @@ import { toast } from "react-toastify";
 import { GetAllUser } from "../../services/userService";
 import "../Users/users.css";
 import { UserContext } from "../../Context/UserProvider";
+import Modal_User from "../ModalUser/Modal_User";
+import Modal_Edit_User from "../Modal_Edit_User/Modal_Edit_User";
 const Users = () => {
 	const [users, setUsers] = useState([]);
 	const { user } = useContext(UserContext);
+	const [userEdit, setUserEdit] = useState({});
+	const [isOpenModalUser, setIsOpenModalUser] = useState(false);
+	const [isOpenModalEditUser, setIsOpenModalEditUser] = useState(false);
 	const GetData = async () => {
 		try {
 			let id_User = "ALL";
@@ -30,30 +35,64 @@ const Users = () => {
 	useEffect(() => {
 		GetData();
 	}, []);
+	const HandleAddNewUser = () => {
+		setIsOpenModalUser(true);
+	};
+	const HandleEditUser = (user) => {
+		setIsOpenModalEditUser(true);
+		setUserEdit(user);
+	};
+	const toggleUserModal = (name) => {
+		if (name === "isOpenModalUser") {
+			setIsOpenModalUser(!isOpenModalUser);
+		} else if (name === "isOpenModalEditUser") {
+			setIsOpenModalEditUser(!isOpenModalEditUser);
+		}
+	};
+	// DoEditUser = async (user) => {
+	// 	try {
+	// 		let respone = await EditUserService(user);
+	// 		console.log(respone);
+	// 		if (respone && respone.errCode === 0) {
+	// 			this.setState({
+	// 				isOpenModalEditUser: false,
+	// 			});
+	// 			await this.GetAllUsers();
+	// 		} else {
+	// 			alert(respone.errMessage);
+	// 		}
+	// 	} catch (e) {
+	// 		console.log(e);
+	// 	}
+	// };
 	return (
 		<div className="user-container">
-			{/* <Modal_User
-				isOpen={this.state.isOpenModalUser}
-				toggle={this.ToggleUserModal}
-				createNewUser={this.createNewUser}
+			<Modal_User
+				isOpen={isOpenModalUser}
+				toggle={toggleUserModal}
+				//createNewUser={createNewUser}
 			/>
-			{this.state.isOpenModalEditUser && (
+			{isOpenModalEditUser && (
 				<Modal_Edit_User
-					isOpen={this.state.isOpenModalEditUser}
-					toggle={this.ToggleUserModal}
-					User_edit={this.state.user_edit}
-					EditUser={this.DoEditUser}
+					isOpen={isOpenModalEditUser}
+					toggle={toggleUserModal}
+					userEdit={userEdit}
+					// EditUser={doEditUser}
 				/>
-			)} */}
+			)}
 			<div className="title text-center">Manage user</div>
-			<div className="mx-1">
-				<button
-					className="btn btn-primary px-3"
-					// onClick={() => this.HandleAddNewUser()}
-				>
-					<i className="fas fa-plus"></i> Add New User
-				</button>
-			</div>
+			{user.account.id === undefined ? (
+				<div className="mx-1">
+					<button
+						className="btn btn-primary px-3"
+						onClick={() => HandleAddNewUser()}
+					>
+						<i className="fas fa-plus"></i> Add New User
+					</button>
+				</div>
+			) : (
+				<></>
+			)}
 			<div className="users-table mt-3 mx-1">
 				<table id="customers">
 					<tbody>
@@ -61,7 +100,8 @@ const Users = () => {
 							<th>Id</th>
 							<th>Email</th>
 							<th>FullName</th>
-							<th>Action</th>
+							<th className="px-5">Action</th>
+							<th>Car Information</th>
 						</tr>
 						{users &&
 							users.length > 0 &&
@@ -74,21 +114,20 @@ const Users = () => {
 										<td>
 											<button
 												className="btn btn-outline-light text-warning mx-2"
-												// onClick={() => this.HandleEditUser(item)}
+												onClick={() => HandleEditUser(item)}
 											>
 												<i className="bi bi-pencil"></i>
-											</button>
-											<button
-												className="btn btn-outline-light text-warning mx-2"
-												// onClick={() => this.HandleEditUser(item)}
-											>
-												<i className="far fa-edit edit_btn"></i>
 											</button>
 											<button
 												className="btn btn-outline-light text-danger ms-3"
 												// onClick={() => this.HandleDeleteUser(item)}
 											>
 												<i className="bi bi-trash"></i>
+											</button>
+										</td>
+										<td>
+											<button className="btn btn-outline-light text-black mx-4">
+												<i class="bi bi-eye"></i>
 											</button>
 										</td>
 									</tr>
