@@ -13,7 +13,7 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			status: {
-				type: Sequelize.STRING,
+				type: Sequelize.ENUM("ACTIVE", "INACTIVE"),
 			},
 			createdAt: {
 				allowNull: false,
