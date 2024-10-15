@@ -29,6 +29,14 @@ module.exports = {
 					key: "id",
 				},
 			},
+			id_reservation: {
+				type: Sequelize.INTEGER,
+				allowNull: false,
+				references: {
+					model: "Reservations",
+					key: "id_reservation",
+				},
+			},
 
 			createdAt: {
 				allowNull: false,

@@ -9,9 +9,6 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
-			method: {
-				type: Sequelize.STRING,
-			},
 			amount: {
 				type: Sequelize.INTEGER,
 			},
@@ -19,12 +16,12 @@ module.exports = {
 				type: Sequelize.DATE,
 				allowNull: false,
 			},
-			id_reservation: {
+			id_car: {
 				type: Sequelize.INTEGER,
 				allowNull: false,
 				references: {
-					model: "Reservations",
-					key: "id_reservation",
+					model: "Cars",
+					key: "id_car",
 				},
 			},
 			createdAt: {

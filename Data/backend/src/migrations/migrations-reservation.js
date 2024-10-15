@@ -13,23 +13,7 @@ module.exports = {
 				type: Sequelize.INTEGER,
 			},
 			type: {
-				type: Sequelize.INTEGER,
-			},
-			id_user: {
-				type: Sequelize.INTEGER,
-				allowNull: false,
-				references: {
-					model: "Users",
-					key: "id",
-				},
-			},
-			id_car: {
-				type: Sequelize.INTEGER,
-				allowNull: false,
-				references: {
-					model: "Cars",
-					key: "id_car",
-				},
+				type: Sequelize.ENUM("Day", "Month", "Year"),
 			},
 			createdAt: {
 				allowNull: false,
