@@ -39,6 +39,9 @@ const LogOutUser = () => {
 const EditUserService = (user_edit) => {
 	return axios.put("/api/edit-user", user_edit);
 };
+const DeleteUser = (idUser) => {
+	return axios.delete("/api/delete-user", { data: { id: idUser } });
+};
 export {
 	LoginUser,
 	CreateNewUser,
@@ -46,4 +49,5 @@ export {
 	getUserAccount,
 	LogOutUser,
 	EditUserService,
+	DeleteUser,
 };
