@@ -9,10 +9,7 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
-			Reservation.belongsTo(models.User, { foreignKey: "id_user" });
-			Reservation.belongsTo(models.Car, {
-				foreignKey: "id_car",
-			});
+			Reservation.hasOne(models.Car, { foreignKey: "id_car" });
 		}
 	}
 	Reservation.init(
@@ -23,10 +20,8 @@ module.exports = (sequelize, DataTypes) => {
 				autoIncrement: true,
 				allowNull: false,
 			},
-			id_user: DataTypes.INTEGER,
-			id_car: DataTypes.INTEGER,
 			price: DataTypes.INTEGER,
-			type: DataTypes.INTEGER,
+			type: DataTypes.ENUM("Day", "Month", "Year"),
 		},
 		{
 			sequelize,

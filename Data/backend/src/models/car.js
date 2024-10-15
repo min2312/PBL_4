@@ -10,6 +10,8 @@ module.exports = (sequelize, DataTypes) => {
 		static associate(models) {
 			// define association here
 			Car.belongsTo(models.User, { foreignKey: "id_user" });
+			Car.belongsTo(models.Reservation, { foreignKey: "id_reservation" });
+			Car.hasOne(models.Payment, { foreignKey: "id_payment" });
 		}
 	}
 	Car.init(
@@ -25,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
 			inTime: DataTypes.DATE,
 			outTime: DataTypes.DATE,
 			id_user: DataTypes.INTEGER,
+			id_reservation: DataTypes.INTEGER,
 		},
 		{
 			sequelize,
