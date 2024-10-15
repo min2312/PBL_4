@@ -1,12 +1,13 @@
 import { Fragment, useContext } from "react";
 import "./App.css";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { BrowserRouter as Router } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ClientRoute from "./Routes/ClientRoute";
 import NavBar from "./Component/NavBar/NavBar";
 import { Oval } from "react-loader-spinner";
 import { UserContext } from "./Context/UserProvider";
+import Footer from "./Component/Common/Footer/Footer";
 function App() {
 	const { user } = useContext(UserContext);
 	return (
@@ -32,6 +33,9 @@ function App() {
 						</div>
 						<div className="app-container">
 							<ClientRoute />
+						</div>
+						<div className="app-footer">
+							<Footer />
 						</div>
 					</>
 				)}
