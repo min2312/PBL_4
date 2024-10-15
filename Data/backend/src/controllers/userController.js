@@ -47,6 +47,12 @@ let HandleCreateNewUser = async (req, res) => {
 let HandleEditUser = async (req, res) => {
 	let data = req.body;
 	let message = await userService.updateUser(data);
+	if (message && message.DT && message.DT.access_token) {
+		res.cookie("jwt", message.DT.access_token, {
+			httpOnly: true,
+			maxAge: 60 * 60 * 1000,
+		});
+	}
 	return res.status(200).json(message);
 };
 let HandleDeleteUser = async (req, res) => {

@@ -161,18 +161,31 @@ let updateUser = (data) => {
 			if (user) {
 				await db.User.update(
 					{
-						firstName: data.firstName,
-						lastName: data.lastName,
-						Address: data.Address,
+						fullName: data.fullName,
+						phone: data.phone,
 					},
 					{
 						where: { id: data.id },
 					}
 				);
-
+				let newUser = await db.User.findOne({
+					where: { id: data.id },
+				});
+				let payload = {
+					id: newUser.id,
+					email: newUser.email,
+					fullName: newUser.fullName,
+				};
+				let token = CreateJWT(payload);
+				delete user.password;
+				delete newUser.password;
 				resolve({
 					errCode: 0,
 					message: "Update User Success!",
+					user: newUser,
+					DT: {
+						access_token: token,
+					},
 				});
 			} else {
 				resolve({
