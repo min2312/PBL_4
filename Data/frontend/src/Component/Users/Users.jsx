@@ -1,13 +1,21 @@
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { GetAllUser } from "../../services/userService";
+import {
+	CreateNewUser,
+	DeleteUser,
+	EditUserService,
+	GetAllUser,
+	LogOutUser,
+} from "../../services/userService";
 import "../Users/users.css";
 import { UserContext } from "../../Context/UserProvider";
 import Modal_User from "../ModalUser/Modal_User";
 import Modal_Edit_User from "../Modal_Edit_User/Modal_Edit_User";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const Users = () => {
+	const history = useHistory();
 	const [users, setUsers] = useState([]);
-	const { user } = useContext(UserContext);
+	const { user, loginContext, logoutContext } = useContext(UserContext);
 	const [userEdit, setUserEdit] = useState({});
 	const [isOpenModalUser, setIsOpenModalUser] = useState(false);
 	const [isOpenModalEditUser, setIsOpenModalEditUser] = useState(false);
@@ -49,35 +57,82 @@ const Users = () => {
 			setIsOpenModalEditUser(!isOpenModalEditUser);
 		}
 	};
-	// DoEditUser = async (user) => {
-	// 	try {
-	// 		let respone = await EditUserService(user);
-	// 		console.log(respone);
-	// 		if (respone && respone.errCode === 0) {
-	// 			this.setState({
-	// 				isOpenModalEditUser: false,
-	// 			});
-	// 			await this.GetAllUsers();
-	// 		} else {
-	// 			alert(respone.errMessage);
-	// 		}
-	// 	} catch (e) {
-	// 		console.log(e);
-	// 	}
-	// };
+	const DoEditUser = async (user) => {
+		try {
+			let response = await EditUserService(user);
+			if (response && response.errCode === 0) {
+				setIsOpenModalEditUser(false);
+				let token = response.DT.access_token;
+				let data = {
+					isAuthenticated: true,
+					token: token,
+					id: response.user.id,
+					account: response.user,
+				};
+				loginContext(data);
+				GetData();
+				toast.success("Update success");
+			} else {
+				alert(response.errMessage);
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	};
+	const createNewUser = async (formValues) => {
+		try {
+			const response = await CreateNewUser(formValues);
+			if (response && response.errCode === 0) {
+				console.log(response);
+				setIsOpenModalUser(false);
+				toast.success("Create New User Success");
+				GetData();
+			} else {
+				toast.error(response.errMessage);
+			}
+		} catch (e) {
+			toast.error("Create User failed. Please try again.");
+			console.log(e);
+		}
+	};
+	const HandleDeleteUser = async (user_id) => {
+		try {
+			const response = await DeleteUser(user_id);
+			if (response && response.errCode === 0) {
+				if (user && user.account && user.account.id === user_id) {
+					let data = await LogOutUser();
+					logoutContext();
+					if (data && data.errCode === 0) {
+						history.push("/");
+						toast.success("account has been deleted");
+					} else {
+						toast.error(data.errMessage);
+					}
+					return;
+				}
+				toast.success("Delete User Success");
+				GetData();
+			} else {
+				toast.error(response.errMessage);
+			}
+		} catch (e) {
+			toast.error("Delete User failed. Please try again.");
+			console.log(e);
+		}
+	};
 	return (
 		<div className="user-container">
 			<Modal_User
 				isOpen={isOpenModalUser}
 				toggle={toggleUserModal}
-				//createNewUser={createNewUser}
+				createNewUser={createNewUser}
 			/>
 			{isOpenModalEditUser && (
 				<Modal_Edit_User
 					isOpen={isOpenModalEditUser}
 					toggle={toggleUserModal}
 					userEdit={userEdit}
-					// EditUser={doEditUser}
+					EditUser={DoEditUser}
 				/>
 			)}
 			<div className="title text-center">Manage user</div>
@@ -100,6 +155,7 @@ const Users = () => {
 							<th>Id</th>
 							<th>Email</th>
 							<th>FullName</th>
+							<th>Phone Number</th>
 							<th className="px-5">Action</th>
 							<th>Car Information</th>
 						</tr>
@@ -111,6 +167,7 @@ const Users = () => {
 										<td>{index + 1}</td>
 										<td>{item.email}</td>
 										<td>{item.fullName}</td>
+										<td>{item.phone}</td>
 										<td>
 											<button
 												className="btn btn-outline-light text-warning mx-2"
@@ -120,7 +177,7 @@ const Users = () => {
 											</button>
 											<button
 												className="btn btn-outline-light text-danger ms-3"
-												// onClick={() => this.HandleDeleteUser(item)}
+												onClick={() => HandleDeleteUser(item.id)}
 											>
 												<i className="bi bi-trash"></i>
 											</button>
