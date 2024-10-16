@@ -26,7 +26,9 @@ const NavBar = () => {
 	};
 	return (
 		<>
-			{location.pathname === "/login" || location.pathname === "/register" ? (
+			{location.pathname === "/login" ||
+			location.pathname === "/register" ||
+			location.pathname === "/admin" ? (
 				<></>
 			) : (
 				<div>
@@ -38,9 +40,19 @@ const NavBar = () => {
 							<Nav>
 								{user && user.isAuthenticated === true ? (
 									<>
+										<Link className="nav-link" to="/users">
+											<button className="btn btn-outline-warning" type="button">
+												Users
+											</button>
+										</Link>
+										<Link className="nav-link" to="/ticket">
+											<button className="btn btn-outline-warning" type="button">
+												Tickets
+											</button>
+										</Link>
 										<NavDropdown
-											title={`Welcome,${user.account.fullName}`}
-											className="NavDropdown"
+											title={`Welcome, ${user.account.fullName || "Admin"}`}
+											className="NavDropdown mt-1"
 											id="basic-nav-dropdown"
 										>
 											<NavDropdown.Item>Change Password</NavDropdown.Item>
@@ -51,14 +63,24 @@ const NavBar = () => {
 										</NavDropdown>
 									</>
 								) : (
-									<Link className="nav-link" to="/login">
-										<button
-											className="btn btn-outline-info me-2 mb-1"
-											type="button"
-										>
-											Login
-										</button>
-									</Link>
+									<>
+										<Link className="nav-link" to="/users">
+											<button
+												className="btn btn-outline-warning me-2 mb-1"
+												type="button"
+											>
+												Users
+											</button>
+										</Link>
+										<Link className="nav-link" to="/login">
+											<button
+												className="btn btn-outline-info me-2 mb-1"
+												type="button"
+											>
+												Login
+											</button>
+										</Link>
+									</>
 								)}
 							</Nav>
 						</div>
