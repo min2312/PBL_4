@@ -24,7 +24,9 @@ const Register = () => {
 			[name]: value,
 		});
 	};
-
+	const ReHomePage = () => {
+		history.push("/");
+	};
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!formValues.fullName || !formValues.email || !formValues.password) {
@@ -50,12 +52,15 @@ const Register = () => {
 			<div className="container-fluid">
 				<div className="row">
 					<div className="col-7 content-left">
-						<div className="brand">Parking Car Systems</div>
+						<div className="brand" onClick={() => ReHomePage()}>
+							Parking Car Systems
+						</div>
 						<div className="title">
-							Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa,
-							inventore porro! Neque ad quod, impedit, accusamus, accusantium
-							incidunt molestiae vel omnis mollitia aliquam earum totam animi
-							consequuntur libero eveniet expedita.
+							Find available parking spots in real-time, with seamless
+							navigation and booking options.Optimize your parking experience
+							with automated entry and secure payment options.Your parking
+							journey simplified. Easy access, real-time updates, and secure
+							payment solutions.
 						</div>
 					</div>
 					<div className="col-4 content-right register-form">
