@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			modelName: "Admin",
+			defaultScope: {
+				attributes: { exclude: ["id"] },
+			},
 		}
 	);
 	return Admin;

@@ -27,6 +27,9 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			modelName: "Payment",
+			defaultScope: {
+				attributes: { exclude: ["id"] },
+			},
 		}
 	);
 	return Payment;

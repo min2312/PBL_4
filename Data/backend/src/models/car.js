@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 				autoIncrement: true,
 				allowNull: false,
 			},
+			name: DataTypes.STRING,
 			license_plate: DataTypes.STRING,
 			type: DataTypes.STRING,
 			inTime: DataTypes.DATE,
@@ -32,6 +33,9 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			modelName: "Car",
+			defaultScope: {
+				attributes: { exclude: ["id"] },
+			},
 		}
 	);
 	return Car;
