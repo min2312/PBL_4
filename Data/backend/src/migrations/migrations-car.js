@@ -9,6 +9,9 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
+			name: {
+				type: Sequelize.STRING,
+			},
 			license_plate: {
 				type: Sequelize.STRING,
 			},
@@ -31,7 +34,7 @@ module.exports = {
 			},
 			id_reservation: {
 				type: Sequelize.INTEGER,
-				allowNull: false,
+				allowNull: true,
 				references: {
 					model: "Reservations",
 					key: "id_reservation",
