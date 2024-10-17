@@ -18,6 +18,7 @@ const Users = () => {
 	const { user, loginContext, logoutContext } = useContext(UserContext);
 	const [userEdit, setUserEdit] = useState({});
 	const [isOpenModalUser, setIsOpenModalUser] = useState(false);
+	const [isOpenModalInfo, setIsOpenModalInfo] = useState(false);
 	const [isOpenModalEditUser, setIsOpenModalEditUser] = useState(false);
 	const GetData = async () => {
 		try {
@@ -50,26 +51,43 @@ const Users = () => {
 		setIsOpenModalEditUser(true);
 		setUserEdit(user);
 	};
+	const HandleGetInfoUser = (userInfo) => {
+		// setIsOpenModalInfo(true);
+		// setUserEdit(userInfo);
+		history.push(`/info-car/id=${userInfo.id}`, { userInfo });
+	};
 	const toggleUserModal = (name) => {
 		if (name === "isOpenModalUser") {
 			setIsOpenModalUser(!isOpenModalUser);
 		} else if (name === "isOpenModalEditUser") {
 			setIsOpenModalEditUser(!isOpenModalEditUser);
+		} else if (name === "isOpenModalInfo") {
+			setIsOpenModalInfo(!isOpenModalInfo);
 		}
 	};
-	const DoEditUser = async (user) => {
+	const DoEditUser = async (user_edit) => {
 		try {
-			let response = await EditUserService(user);
+			let response = await EditUserService(user_edit);
 			if (response && response.errCode === 0) {
 				setIsOpenModalEditUser(false);
-				let token = response.DT.access_token;
-				let data = {
-					isAuthenticated: true,
-					token: token,
-					id: response.user.id,
-					account: response.user,
-				};
-				loginContext(data);
+				if (!user.account.id_admin) {
+					let token = response.DT.access_token;
+					let data = {
+						isAuthenticated: true,
+						token: token,
+						id: response.user.id,
+						account: response.user,
+					};
+					loginContext(data);
+				} else {
+					let token = response.DT.access_token;
+					let data = {
+						isAuthenticated: true,
+						token: token,
+						id: response.user.id,
+						account: response.user,
+					};
+				}
 				GetData();
 				toast.success("Update success");
 			} else {
@@ -83,10 +101,10 @@ const Users = () => {
 		try {
 			const response = await CreateNewUser(formValues);
 			if (response && response.errCode === 0) {
-				console.log(response);
 				setIsOpenModalUser(false);
 				toast.success("Create New User Success");
 				GetData();
+				return response;
 			} else {
 				toast.error(response.errMessage);
 			}
@@ -183,8 +201,11 @@ const Users = () => {
 											</button>
 										</td>
 										<td>
-											<button className="btn btn-outline-light text-black mx-4">
-												<i class="bi bi-eye"></i>
+											<button
+												className="btn btn-outline-light text-black mx-4"
+												onClick={() => HandleGetInfoUser(item)}
+											>
+												<i className="bi bi-eye"></i>
 											</button>
 										</td>
 									</tr>

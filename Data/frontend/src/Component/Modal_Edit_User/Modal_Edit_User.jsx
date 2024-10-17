@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Button, Modal } from "react-bootstrap";
+import Car_Modal from "../Car/Car_Modal";
+import { CreateNewCar, getAllCar } from "../../services/apiService";
 const Modal_Edit_User = (props) => {
 	const [formData, setFormData] = useState({
 		email: "",
@@ -8,6 +10,9 @@ const Modal_Edit_User = (props) => {
 		id: "",
 		phone: "",
 	});
+	const [isOpenModalCar, setIsOpenModalCar] = useState(false);
+	const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(props.isOpen);
+	const [userCar, setUserCar] = useState([]);
 	useEffect(() => {
 		let user = props.userEdit;
 		if (user && Object.keys(user).length > 0) {
@@ -19,6 +24,51 @@ const Modal_Edit_User = (props) => {
 			});
 		}
 	}, [props.userEdit]);
+
+	useEffect(() => {
+		setIsEditUserModalOpen(props.isOpen);
+	}, [props.isOpen]);
+
+	useEffect(() => {
+		if (props.isOpen && props.userEdit && props.userEdit.id) {
+			fetchUserCars();
+		}
+	}, [props.isOpen, props.userEdit]);
+	const fetchUserCars = async () => {
+		try {
+			const car_account = await getAllCar(props.userEdit.id);
+			if (car_account && car_account.errCode === 0) {
+				setUserCar(car_account.car);
+			} else {
+				toast.error(car_account.errMessage);
+			}
+		} catch (error) {
+			console.error("Failed to fetch cars:", error);
+		}
+	};
+	const HandleAddNewCar = () => {
+		setIsOpenModalCar(true);
+		setIsEditUserModalOpen(false);
+	};
+	const toggleCarModal = () => {
+		setIsOpenModalCar(!isOpenModalCar);
+		setIsEditUserModalOpen(true);
+	};
+	const createNewCar = async (car) => {
+		try {
+			const response = await CreateNewCar(car, props.userEdit);
+			if (response && response.errCode === 0) {
+				fetchUserCars();
+				setIsOpenModalCar(false);
+				setIsEditUserModalOpen(true);
+				toast.success("Add Car success");
+			} else {
+				toast.error(response.errMessage);
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	};
 	const handleChangeInput = (event, id) => {
 		setFormData({
 			...formData,
@@ -27,7 +77,7 @@ const Modal_Edit_User = (props) => {
 	};
 	const checkValidInput = () => {
 		let isValid = true;
-		const arrInput = ["email", "password", "firstName", "lastName", "Address"];
+		const arrInput = ["email", "fullName", "phone"];
 		for (let i = 0; i < arrInput.length; i++) {
 			if (!formData[arrInput[i]]) {
 				isValid = false;
@@ -45,9 +95,20 @@ const Modal_Edit_User = (props) => {
 	};
 	return (
 		<div className="text-center">
+			<Car_Modal
+				isOpen={isOpenModalCar}
+				toggle={toggleCarModal}
+				createNewCar={createNewCar}
+			/>
 			<Modal
-				show={props.isOpen}
-				onHide={() => props.toggle("isOpenModalEditUser")}
+				show={isEditUserModalOpen}
+				onHide={() => {
+					props.toggle("isOpenModalEditUser");
+					setIsEditUserModalOpen(false);
+					if (isOpenModalCar) {
+						setIsOpenModalCar(false);
+					}
+				}}
 				className={"abc"}
 				size="lg"
 				centered
@@ -96,21 +157,28 @@ const Modal_Edit_User = (props) => {
 						<tbody>
 							<tr>
 								<th>STT</th>
-								<th>Type Car</th>
+								<th>Name Car</th>
 								<th>License Plate</th>
-								<th>In Time</th>
-								<th>Out Time</th>
+								<th>Type Car</th>
 							</tr>
-							<tr>
-								<td>1</td>
-								<td>Ô tô</td>
-								<td>30E-12345</td>
-								<td>08:00</td>
-								<td>17:00</td>
-							</tr>
+
+							{userCar &&
+								userCar.length > 0 &&
+								userCar.map((item, index) => {
+									return (
+										<tr key={item.id_car}>
+											<td>{index + 1}</td>
+											<td>{item.name}</td>
+											<td>{item.license_plate}</td>
+											<td>{item.type}</td>
+										</tr>
+									);
+								})}
 						</tbody>
 					</table>
-					<button className="button_add_car">Add Car</button>
+					<button className="button_add_car" onClick={HandleAddNewCar}>
+						Add Car
+					</button>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button color="primary" className="px-2" onClick={handleEditUser}>
