@@ -38,19 +38,19 @@ const Modal_Search = (props) => {
 					<div className="modal-user-body">
 						<div className="row mb-3">
 							<div className="col-md-12">
-								<div class="input-group mb-3">
+								<div className="input-group mb-3">
 									<input
 										type="text"
-										class="form-control"
+										className="form-control"
 										placeholder="Search username"
 										aria-label="Search username"
 										aria-describedby="basic-addon2"
 										value={searchTerm}
 										onChange={(e) => setSearchTerm(e.target.value)}
 									/>
-									<div class="input-group-append">
+									<div className="input-group-append">
 										<button
-											class="btn btn-success"
+											className="btn btn-success"
 											type="button"
 											onClick={handleSearch}
 										>
