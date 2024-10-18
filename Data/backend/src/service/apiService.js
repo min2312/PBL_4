@@ -41,22 +41,27 @@ let CreateNewCar = (data, user) => {
 let GetAllCar = (Idcar) => {
 	return new Promise(async (resolve, reject) => {
 		try {
-			let data = await db.Car.findAll({
-				attributes: [
-					"id_car",
-					"name",
-					"license_plate",
-					"type",
-					"inTime",
-					"outTime",
-					"id_user",
-					"id_reservation",
-					"createdAt",
-					"updatedAt",
-				],
-				where: { id_user: Idcar },
-			});
-			resolve(data);
+			let iduser = Array.isArray(Idcar) ? Idcar : Idcar.split(",");
+			let allCar = [];
+			for (let i = 0; i < iduser.length; i++) {
+				let data = await db.Car.findAll({
+					attributes: [
+						"id_car",
+						"name",
+						"license_plate",
+						"type",
+						"inTime",
+						"outTime",
+						"id_user",
+						"id_reservation",
+						"createdAt",
+						"updatedAt",
+					],
+					where: { id_user: iduser[i] },
+				});
+				allCar = allCar.concat(data);
+			}
+			resolve(allCar);
 		} catch (e) {
 			reject(e);
 		}
@@ -87,6 +92,81 @@ let DeleteCar = (User_id) => {
 		}
 	});
 };
+let GetTicketType = (typeTicket) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let ticket = await db.Reservation.findOne({
+				where: { type: typeTicket },
+			});
+			resolve(ticket);
+		} catch (e) {
+			reject(e);
+		}
+	});
+};
+const formatDateForDatabase = (dateString) => {
+	const [day, month, year] = dateString.split("/");
+	return `${year}-${month}-${day}`;
+};
+let CreatePayment = (data) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let date = formatDateForDatabase(data.paymentDate);
+			let car_account = await db.Car.findOne({
+				where: { license_plate: data.licenseplate },
+			});
+			let reservation = await db.Reservation.findOne({
+				where: { type: data.type },
+			});
+
+			if (!car_account) {
+				return resolve({
+					errCode: 1,
+					errMessage: "Car not found.",
+				});
+			}
+
+			let payment = await db.Payment.findOne({
+				where: { id_car: car_account.id_car, amount: data.price },
+			});
+
+			if (payment) {
+				await db.Payment.update(
+					{ amount: data.price, paymentDate: date, id_car: car_account.id_car },
+					{ where: { id_payment: payment.id_payment } }
+				);
+				resolve({
+					errCode: 0,
+					errMessage: "Ticket updated successfully.",
+				});
+			} else {
+				if (reservation) {
+					await db.Payment.create({
+						amount: data.price,
+						paymentDate: date,
+						id_car: car_account.id_car,
+					});
+					await db.Car.update(
+						{ id_reservation: reservation.id_reservation },
+						{ where: { id_car: car_account.id_car } }
+					);
+					resolve({
+						errCode: 0,
+						errMessage: "Ticket created successfully.",
+					});
+				} else {
+					resolve({
+						errCode: 1,
+						errMessage: "Missing required reservation information!",
+					});
+				}
+			}
+		} catch (e) {
+			reject(e);
+		}
+	});
+};
+
 let CheckLicensePlate = (LicensePlate) => {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -119,4 +199,6 @@ module.exports = {
 	CreateNewCar,
 	GetAllCar,
 	DeleteCar,
+	GetTicketType,
+	CreatePayment,
 };
