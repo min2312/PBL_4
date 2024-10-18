@@ -28,7 +28,36 @@ let HandleGetAllCar = async (req, res) => {
 		car: car,
 	});
 };
+let HandleGetTypeTicket = async (req, res) => {
+	let type_ticket = req.query.type;
+	try {
+		const result = await apiService.GetTicketType(type_ticket);
+		return res.status(200).json(result);
+	} catch (error) {
+		console.error(error);
+		return res
+			.status(500)
+			.json({ errCode: 1, message: "Error get type ticket" });
+	}
+};
+let HandleCreatePayment = async (req, res) => {
+	let data = req.body;
+	try {
+		const result = await apiService.CreatePayment(data);
+		return res.status(200).json({
+			errCode: result.errCode,
+			errMessage: result.errMessage,
+		});
+	} catch (error) {
+		console.error(error);
+		return res
+			.status(500)
+			.json({ errCode: 1, errMessage: "Error Create Ticket" });
+	}
+};
 module.exports = {
 	HandleCreateNewCar: HandleCreateNewCar,
 	HandleGetAllCar: HandleGetAllCar,
+	HandleGetTypeTicket: HandleGetTypeTicket,
+	HandleCreatePayment: HandleCreatePayment,
 };
