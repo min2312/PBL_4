@@ -5,8 +5,9 @@ const CreateNewCar = (car, user) => {
 };
 
 const getAllCar = async (InputId) => {
+	let idQuery = Array.isArray(InputId) ? InputId.join(",") : InputId;
 	return axios
-		.get(`/api/getAllCar?id=${InputId}`)
+		.get(`/api/getAllCar?id=${idQuery}`)
 		.then((response) => {
 			return response;
 		})
@@ -14,4 +15,10 @@ const getAllCar = async (InputId) => {
 			console.log(err);
 		});
 };
-export { CreateNewCar, getAllCar };
+const getTypeTicket = async (type_ticket) => {
+	return axios.get(`/api/getTypeTicket?type=${type_ticket}`);
+};
+const CreateTicket = async (data) => {
+	return axios.post("/api/create-ticket", data);
+};
+export { CreateNewCar, getAllCar, getTypeTicket, CreateTicket };
