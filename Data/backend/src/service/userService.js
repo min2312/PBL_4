@@ -93,6 +93,33 @@ let getAllUser = (userId) => {
 		}
 	});
 };
+let getInfoCar = (userId) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let users = "";
+			let car = "";
+			if (userId === "ALL") {
+				users = await db.User.findAll({
+					attributes: {
+						exclude: ["password"],
+					},
+				});
+			}
+			if (userId && userId !== "ALL") {
+				users = await db.User.findOne({
+					where: { id: userId },
+					attributes: {
+						exclude: ["password"],
+					},
+				});
+			}
+			resolve(users);
+		} catch (e) {
+			reject(e);
+		}
+	});
+};
+
 let CreateNewUser = (data) => {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -104,7 +131,7 @@ let CreateNewUser = (data) => {
 				});
 			} else {
 				let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-				await db.User.create({
+				let new_user = await db.User.create({
 					//(value my sql): (value name-html)
 					email: data.email,
 					password: hashPasswordFromBcrypt,
@@ -114,6 +141,7 @@ let CreateNewUser = (data) => {
 				resolve({
 					errCode: 0,
 					message: "Create success",
+					user: new_user,
 				});
 			}
 		} catch {
@@ -214,4 +242,5 @@ module.exports = {
 	CreateNewUser: CreateNewUser,
 	DeleteUser: DeleteUser,
 	updateUser: updateUser,
+	getInfoCar: getInfoCar,
 };
