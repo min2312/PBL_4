@@ -28,6 +28,23 @@ let HandleGetAllCar = async (req, res) => {
 		car: car,
 	});
 };
+let HandleGetAllCar_Ticket = async (req, res) => {
+	let id = req.query.id;
+	if (!id) {
+		return res.status(200).json({
+			errCode: 1,
+			errMessage: "Missing required parameter",
+			car: [],
+		});
+	}
+	let car = await apiService.GetCar_Ticket(id);
+	return res.status(200).json({
+		errCode: 0,
+		errMessage: "OK",
+		car: car,
+	});
+};
+
 let HandleGetTypeTicket = async (req, res) => {
 	let type_ticket = req.query.type;
 	try {
@@ -55,9 +72,24 @@ let HandleCreatePayment = async (req, res) => {
 			.json({ errCode: 1, errMessage: "Error Create Ticket" });
 	}
 };
+let HandleDeleteTicket = async (req, res) => {
+	console.log("aa", req.body.id_car);
+	if (!req.body) {
+		return res.status(200).json({
+			errCode: 1,
+			errMessage: "Missing required parameters!",
+		});
+	}
+	let message = await apiService.DeleteTicket(req.body.id_car);
+	return res.status(200).json({
+		...message,
+	});
+};
 module.exports = {
 	HandleCreateNewCar: HandleCreateNewCar,
 	HandleGetAllCar: HandleGetAllCar,
+	HandleGetAllCar_Ticket: HandleGetAllCar_Ticket,
 	HandleGetTypeTicket: HandleGetTypeTicket,
 	HandleCreatePayment: HandleCreatePayment,
+	HandleDeleteTicket: HandleDeleteTicket,
 };
