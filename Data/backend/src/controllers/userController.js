@@ -1,4 +1,5 @@
 import userService from "../service/userService";
+import apiService from "../service/apiService";
 let HandleLogin = async (req, res) => {
 	let email = req.body.email;
 	let pass = req.body.password;
@@ -62,6 +63,7 @@ let HandleDeleteUser = async (req, res) => {
 			errMessage: "Missing required parameters!",
 		});
 	}
+	let result = await apiService.DeleteCar(req.body.id);
 	let message = await userService.DeleteUser(req.body.id);
 	return res.status(200).json({
 		...message,
@@ -94,6 +96,23 @@ const HandleLogOut = (req, res) => {
 		});
 	}
 };
+let HandleGetInfoCar = async (req, res) => {
+	let id = req.query.id;
+	if (!id) {
+		return res.status(200).json({
+			errCode: 1,
+			errMessage: "Missing required parameter",
+			user: [],
+		});
+	}
+	let user = await userService.getInfoCar(id);
+	return res.status(200).json({
+		errCode: 0,
+		errMessage: "OK",
+		user: user,
+	});
+};
+
 module.exports = {
 	HandleLogin: HandleLogin,
 	HandleGetAllUser: HandleGetAllUser,
@@ -102,4 +121,5 @@ module.exports = {
 	HandleDeleteUser: HandleDeleteUser,
 	getUserAccount,
 	HandleLogOut: HandleLogOut,
+	HandleGetInfoCar: HandleGetInfoCar,
 };
