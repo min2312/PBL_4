@@ -153,7 +153,9 @@ const Users = () => {
 					EditUser={DoEditUser}
 				/>
 			)}
-			<div className="title text-center">Manage user</div>
+			<div className="title text-center">
+				<h2>Manage user</h2>
+			</div>
 			{user.account.id === undefined ? (
 				<div className="mx-1">
 					<button
