@@ -4,9 +4,8 @@
  
 const char* WIFI_SSID = "Toanlake";
 const char* WIFI_PASS = "123456789";
- 
-WebServer server(80);
- 
+
+WebServer server(80); 
  
 static auto loRes = esp32cam::Resolution::find(320, 240);
 static auto midRes = esp32cam::Resolution::find(350, 530);
