@@ -7,7 +7,7 @@ import PrivateRoutes from "./PrivateRoutes";
 import Users from "../Component/Users/Users";
 import Login_Admin from "../pages/Admin/Login_Admin";
 import Ticket from "../pages/Ticket/Ticket";
-import InfoCar from "../Component/Info Car/InfoCar";
+import InfoCar from "../Component/InfoCar/InfoCar";
 import Add_Ticket from "../pages/Ticket/Add_Ticket";
 const ClientRoute = () => {
 	return (
