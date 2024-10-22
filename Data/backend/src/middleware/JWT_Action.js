@@ -6,6 +6,7 @@ const nonSecurePaths = [
 	"/api/create-new-user",
 	"/api/logout",
 	"/api/admin_login",
+	"/api/createTime",
 ];
 
 const CreateJWT = (payload) => {
