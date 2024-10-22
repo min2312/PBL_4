@@ -1,5 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import {
+	useHistory,
+	useLocation,
+} from "react-router-dom/cjs/react-router-dom.min";
 import { GetAllUser } from "../../services/userService";
 import { CreateTicket, getTypeTicket } from "../../services/apiService";
 import { UserContext } from "../../Context/UserProvider";
@@ -9,6 +12,7 @@ import Modal_Search from "../../Component/ModalUser/Modal_Search";
 
 const Add_Ticket = () => {
 	const history = useHistory();
+	const location = useLocation();
 	const [users, setUsers] = useState([]);
 	const { user } = useContext(UserContext);
 	const [isOpenModalSearch, setIsOpenModalSearch] = useState(false);
@@ -23,6 +27,7 @@ const Add_Ticket = () => {
 	};
 	const [formValues, setFormValues] = useState(defaultValue);
 	const [userCar, setUserCar] = useState([]);
+	const [selectedTicketType, setSelectedTicketType] = useState("");
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setFormValues({
@@ -51,6 +56,27 @@ const Add_Ticket = () => {
 			console.log("err:", e);
 		}
 	};
+	const GetUser_ticket = () => {
+		if (location.state && location.state.user_ticket) {
+			setFormValues({
+				id_user: location.state.user_ticket.users.id,
+				fullName: location.state.user_ticket.users.fullName,
+				phone: location.state.user_ticket.users.phone,
+				type: location.state.user_ticket.Reservation.type,
+				price: location.state.user_ticket.Reservation.price,
+				paymentDate: location.state.user_ticket.paymentDate,
+				licenseplate: location.state.user_ticket.license_plate,
+			});
+			setSelectedTicketType(location.state.user_ticket.Reservation.type);
+		} else {
+			setFormValues(defaultValue);
+		}
+	};
+	useEffect(() => {
+		if (location && location.state !== "") {
+			GetUser_ticket();
+		}
+	}, [location]);
 	useEffect(() => {
 		GetData();
 		fetchUserCars();
@@ -77,6 +103,7 @@ const Add_Ticket = () => {
 	};
 	const HandleSelectType = async (e) => {
 		const selectedValue = e.target.value;
+		setSelectedTicketType(selectedValue);
 		if (selectedValue !== "Choose...") {
 			let ticket = await getTypeTicket(selectedValue);
 			if (userCar.some((car) => car.license_plate === selectedValue)) {
@@ -203,23 +230,37 @@ const Add_Ticket = () => {
 					</div>
 				</div>
 				<div className="col-6">
-					<div className="input-group mb-3">
-						<div className="input-group-prepend">
-							<span className="input-group-text fw-bold">License Plate:</span>
+					{location && location.state === undefined ? (
+						<div className="input-group mb-3">
+							<div className="input-group-prepend">
+								<span className="input-group-text fw-bold">License Plate:</span>
+							</div>
+							<select className="form-select" onChange={HandleSelectType}>
+								<option defaultValue>Choose...</option>
+								{userCar &&
+									userCar.length > 0 &&
+									userCar.map((car, index) => {
+										return (
+											<option key={index} value={car.license_plate}>
+												{car.license_plate}
+											</option>
+										);
+									})}
+							</select>
 						</div>
-						<select className="form-select" onChange={HandleSelectType}>
-							<option defaultValue>Choose...</option>
-							{userCar &&
-								userCar.length > 0 &&
-								userCar.map((car, index) => {
-									return (
-										<option key={index} value={car.license_plate}>
-											{car.license_plate}
-										</option>
-									);
-								})}
-						</select>
-					</div>
+					) : (
+						<div className="input-group mb-3">
+							<span className="input-group-text fw-bold">License Plate:</span>
+							<input
+								type="text"
+								className="form-control"
+								name="licenseplate"
+								value={formValues.licenseplate}
+								onChange={handleInputChange}
+								disabled
+							/>
+						</div>
+					)}
 					<div className="mb-3">
 						<div className="input-group">
 							<span className="input-group-text fw-bold">Price:</span>
@@ -233,17 +274,35 @@ const Add_Ticket = () => {
 							/>
 						</div>
 					</div>
-					<div className="input-group mb-3">
-						<div className="input-group-prepend">
-							<span className="input-group-text fw-bold">Ticket Type:</span>
+					{location && location.state === "" ? (
+						<div className="input-group mb-3">
+							<div className="input-group-prepend">
+								<span className="input-group-text fw-bold">Ticket Type:</span>
+							</div>
+							<select className="form-select" onChange={HandleSelectType}>
+								<option defaultValue>Choose...</option>
+								<option value="Day">Day</option>
+								<option value="Month">Month</option>
+								<option value="Year">Year</option>
+							</select>
 						</div>
-						<select className="form-select" onChange={HandleSelectType}>
-							<option defaultValue>Choose...</option>
-							<option value="Day">Day</option>
-							<option value="Month">Month</option>
-							<option value="Year">Year</option>
-						</select>
-					</div>
+					) : (
+						<div className="input-group mb-3">
+							<div className="input-group-prepend">
+								<span className="input-group-text fw-bold">Ticket Type:</span>
+							</div>
+							<select
+								value={selectedTicketType}
+								className="form-select"
+								onChange={HandleSelectType}
+							>
+								<option defaultValue>Choose...</option>
+								<option value="Day">Day</option>
+								<option value="Month">Month</option>
+								<option value="Year">Year</option>
+							</select>
+						</div>
+					)}
 				</div>
 			</div>
 			<div className="d-flex justify-content-center mt-5">

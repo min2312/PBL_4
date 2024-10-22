@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import { getAllCar } from "../../services/apiService";
+import {
+	DeleteTicket,
+	getAllCar,
+	getAllCar_Ticket,
+} from "../../services/apiService";
 import { toast } from "react-toastify";
 import { UserContext } from "../../Context/UserProvider";
 import { GetAllUser } from "../../services/userService";
@@ -37,7 +41,7 @@ const Ticket = () => {
 	const fetchUserCars = async () => {
 		try {
 			let user_id = users.map((userItem) => userItem.id);
-			const car_account = await getAllCar(user_id);
+			const car_account = await getAllCar_Ticket(user_id);
 			if (car_account && car_account.errCode === 0) {
 				setUserCar(car_account.car);
 			} else {
@@ -47,12 +51,17 @@ const Ticket = () => {
 			console.error("Failed to fetch cars:", error);
 		}
 	};
-
+	const formatDate = (dateString) => {
+		const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+		const date = new Date(dateString);
+		return date.toLocaleDateString("vi-VN", options);
+	};
 	const fetchTotal = () => {
 		const combinedData = userCar.map((car) => {
 			return {
 				...car,
 				users: users.find((user) => user.id === car.id_user) || {},
+				paymentDate: car.paymentDate ? formatDate(car.paymentDate) : "",
 			};
 		});
 		setUserTicket(combinedData);
@@ -73,15 +82,35 @@ const Ticket = () => {
 			fetchTotal();
 		}
 	}, [users, userCar]);
-
+	const HandleEditTicket = (user_ticket) => {
+		history.push("/ticket/create", { user_ticket });
+	};
+	const HandleDeleteTicket = async (data) => {
+		try {
+			let result = await DeleteTicket(data);
+			if (result && result.errCode === 0) {
+				toast.success(result.message);
+			} else {
+				toast.error(result.errMessage);
+			}
+			await GetData();
+			await fetchUserCars();
+			fetchTotal();
+		} catch (e) {
+			console.log("err: ", e);
+		}
+	};
 	const HandleAddTicket = () => {
 		history.push("/ticket/create");
 	};
 
 	return (
 		<div className="users-table mt-3 mx-1">
-			{console.log("check: ", userTicket)}
+			<div className="title text-center mb-3">
+				<h2>Manage Ticket</h2>
+			</div>
 			<table id="customers">
+				{console.log(userTicket)}
 				<tbody>
 					<tr>
 						<th>STT</th>
@@ -95,32 +124,44 @@ const Ticket = () => {
 						<th>Ticket Renewal</th>
 						<th>Delete</th>
 					</tr>
-					{userTicket &&
-						userTicket.length > 0 &&
+					{userTicket && userTicket.length > 0 ? (
 						userTicket.map((item, index) => {
 							return (
 								<tr key={index}>
 									<td>{index + 1}</td>
 									<td>MV - {index + 1}</td>
-									<td></td>
-									<td>{item.fullName}</td>
-									<td>{item.phone}</td>
+									<td>{item.license_plate}</td>
+									<td>{item.users.fullName}</td>
+									<td>{item.users.phone}</td>
+									<td>{item.Reservation.type}</td>
+									<td>{item.Reservation.price}</td>
+									<td>{item.paymentDate}</td>
 									<td>
-										<button className="btn btn-outline-light text-warning mx-2">
+										<button
+											className="btn btn-outline-light text-warning mx-2"
+											onClick={() => HandleEditTicket(item)}
+										>
 											<i className="bi bi-pencil"></i>
-										</button>
-										<button className="btn btn-outline-light text-danger ms-3">
-											<i className="bi bi-trash"></i>
 										</button>
 									</td>
 									<td>
-										<button className="btn btn-outline-light text-black mx-4">
-											<i className="bi bi-eye"></i>
+										<button
+											className="btn btn-outline-light text-danger ms-3"
+											onClick={() => HandleDeleteTicket(item)}
+										>
+											<i className="bi bi-trash"></i>
 										</button>
 									</td>
 								</tr>
 							);
-						})}
+						})
+					) : (
+						<tr>
+							<td colSpan="10" className="text-center text-danger">
+								<h4>No Tickets Yet</h4>
+							</td>
+						</tr>
+					)}
 				</tbody>
 			</table>
 			<button className="btn btn-success mt-5 ms-5" onClick={HandleAddTicket}>
