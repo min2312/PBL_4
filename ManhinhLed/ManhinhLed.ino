@@ -10,9 +10,11 @@ const char* password = "123456789";
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
-String licensePlate = "";
+String message  = "";
 Servo myServo;
-int servoPin = D4;
+int servoPin = 2;
+unsigned long servoStartTime = 0;
+bool servoMoving = false;
 void setup() {
   Serial.begin(115200);  
   // Khởi động LCD
@@ -41,24 +43,49 @@ void setup() {
 
 void loop() {
   webSocket.loop();  // Lắng nghe các kết nối WebSocket
-
-  if (licensePlate.length() > 0) {
-    lcd.clear();
-    lcd.setCursor(2, 0);
-    lcd.print("Chao mung!");
-    lcd.setCursor((16 - licensePlate.length()) / 2, 1);
-    lcd.print(licensePlate);
-    myServo.write(90); 
-    delay(5000);
+  if (servoMoving && (millis() - servoStartTime >= 3000)) {
     myServo.write(0);
-    licensePlate = ""; 
-    delay(3000);
+    delay(500); 
+    servoMoving = false; 
+    message = "";
+  }
+  if (message.length() > 0 && !servoMoving) {
+    if(isLicensePlate(message)){
+      lcd.clear();
+      lcd.setCursor(2, 0);
+      lcd.print("WelCome!");
+      lcd.setCursor((16 - message.length()) / 2, 1);
+      lcd.print(message);
+      myServo.write(180);
+      delay(500); 
+      servoStartTime = millis();  
+      servoMoving = true; 
+    }else{
+      if (message.startsWith("Good Bye-")) {
+        String licensePlate = message.substring(9); 
+        lcd.clear();
+        lcd.setCursor(2, 0);  
+        lcd.print("Good Bye");
+        lcd.setCursor((16 - licensePlate.length()) / 2, 1);  
+        lcd.print(licensePlate);
+        myServo.write(180); 
+        delay(500);
+        servoStartTime = millis();
+        servoMoving = true;
+      }else{
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print(message);
+      }
+    }
   }
 }
-
+bool isLicensePlate(String msg) {
+  return (msg.length() >= 5 && msg.length() <= 10); 
+}
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
   if (type == WStype_TEXT) {
-    licensePlate = String((char*)payload);  // Lấy biển số xe từ WebSocket message
-    Serial.println("Biển số nhận được: " + licensePlate);
+    message = String((char*)payload);  // Lấy thông điệp từ WebSocket
+    Serial.println("message nhận được: " + message);
   }
 }
