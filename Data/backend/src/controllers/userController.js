@@ -63,6 +63,10 @@ let HandleDeleteUser = async (req, res) => {
 			errMessage: "Missing required parameters!",
 		});
 	}
+	let car = await apiService.GetAllCar(`${req.body.id}`);
+	car.forEach(async (cars) => {
+		let ticket = await apiService.DeleteTicket(cars.id_car);
+	});
 	let result = await apiService.DeleteCar(req.body.id);
 	let message = await userService.DeleteUser(req.body.id);
 	return res.status(200).json({
