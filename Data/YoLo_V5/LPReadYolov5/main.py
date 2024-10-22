@@ -15,14 +15,14 @@ yolo_LP_detect.conf = 0.50
 yolo_license_plate.conf = 0.60
 
 # Kết nối đến WebSocket của ESP8266
-ws = websocket.create_connection("ws://10.10.0.137:81")  # Địa chỉ IP của ESP8266
+ws = websocket.create_connection("ws://192.168.43.206:81")  # Địa chỉ IP của ESP8266
 
 previous_plate = ""
 count = 0
 required_count = 5
 
 # URL camera IP
-url = 'http://10.10.1.137/cam-hi.jpg'
+url = 'http://192.168.43.70/cam-hi.jpg'
 
 prev_frame_time = 0
 new_frame_time = 0
