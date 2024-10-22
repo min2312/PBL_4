@@ -21,6 +21,7 @@ let initWebRoutes = (app) => {
 	router.post("/api/create-new-car", apiController.HandleCreateNewCar);
 	router.post("/api/create-ticket", apiController.HandleCreatePayment);
 	router.post("/api/delete-ticket", apiController.HandleDeleteTicket);
+	router.post("/api/createTime", apiController.HandleCreateTime);
 	router.delete("/api/delete-user", userController.HandleDeleteUser);
 	return app.use("/", router);
 };
