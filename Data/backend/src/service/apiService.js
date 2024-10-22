@@ -1,6 +1,6 @@
 import { raw } from "mysql2";
-import db from "../models/index";
-import { where } from "sequelize";
+import db, { Sequelize } from "../models/index";
+import { Op, where } from "sequelize";
 import { response } from "express";
 import { getAllUser } from "../service/userService";
 require("dotenv").config();
@@ -140,7 +140,6 @@ let GetCar_Ticket = (id_user) => {
 let DeleteTicket = (id_car) => {
 	return new Promise(async (resolve, reject) => {
 		try {
-			console.log("id", id_car);
 			let payment = await db.Payment.findOne({
 				where: { id_car: id_car },
 			});
@@ -149,7 +148,7 @@ let DeleteTicket = (id_car) => {
 					where: { id_car: id_car },
 				});
 				await db.Car.update(
-					{ id_reservation: null },
+					{ id_reservation: null, inTime: null, outTime: null },
 					{ where: { id_car: id_car } }
 				);
 				resolve({
@@ -276,6 +275,107 @@ let CreatePayment = (data) => {
 		}
 	});
 };
+let CreateTimeCar = (LicensePlate) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let check = await CheckLicensePlate(LicensePlate);
+			if (check) {
+				let car = await db.Car.findOne({
+					where: { license_plate: LicensePlate },
+				});
+
+				if (!car.id_reservation) {
+					resolve({
+						errCode: -1,
+						errMessage: "Not Have Ticket",
+					});
+				} else {
+					const recentCheck = new Date();
+					recentCheck.setHours(recentCheck.getHours() + 7);
+					let carTicket = await GetCar_Ticket(`${car.id_user}`);
+					if (carTicket.length > 0) {
+						let expiredCar = carTicket.find(
+							(ticket) => ticket.license_plate === car.license_plate
+						);
+						if (expiredCar.paymentDate < recentCheck) {
+							resolve({
+								errCode: 2,
+								errMessage: "Expired Ticket",
+							});
+						}
+					}
+					if (!car.inTime) {
+						await db.Car.update(
+							{
+								inTime: recentCheck,
+							},
+							{ where: { id_car: car.id_car } }
+						);
+						resolve({
+							errCode: 0,
+							errMessage: car.license_plate,
+						});
+					} else if (!car.outTime) {
+						await db.Car.update(
+							{
+								outTime: recentCheck,
+							},
+							{ where: { id_car: car.id_car } }
+						);
+						resolve({
+							errCode: 0,
+							errMessage: `Good Bye-${car.license_plate}`,
+						});
+					} else {
+						if (car.inTime > car.outTime) {
+							await db.Car.update(
+								{
+									outTime: recentCheck,
+								},
+								{ where: { id_car: car.id_car } }
+							);
+							resolve({
+								errCode: 0,
+								errMessage: `Good Bye-${car.license_plate}`,
+							});
+						} else {
+							let carTicket = await GetCar_Ticket(`${car.id_user}`);
+							if (carTicket.length > 0) {
+								let expiredCar = carTicket.find(
+									(ticket) => ticket.license_plate === car.license_plate
+								);
+								if (expiredCar.paymentDate < recentCheck) {
+									resolve({
+										errCode: 2,
+										errMessage: "Expired Ticket",
+									});
+								}
+							}
+							await db.Car.update(
+								{
+									inTime: recentCheck,
+								},
+								{ where: { id_car: car.id_car } }
+							);
+							resolve({
+								errCode: 0,
+								errMessage: car.license_plate,
+							});
+						}
+					}
+				}
+			} else {
+				resolve({
+					errCode: 1,
+					errMessage: "Car Not Exist",
+				});
+			}
+		} catch (error) {
+			reject(error);
+		}
+	});
+};
+
 let CheckLicensePlate = (LicensePlate) => {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -312,4 +412,5 @@ module.exports = {
 	GetTicketType,
 	CreatePayment,
 	GetCar_Ticket,
+	CreateTimeCar,
 };
