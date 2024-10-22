@@ -73,7 +73,6 @@ let HandleCreatePayment = async (req, res) => {
 	}
 };
 let HandleDeleteTicket = async (req, res) => {
-	console.log("aa", req.body.id_car);
 	if (!req.body) {
 		return res.status(200).json({
 			errCode: 1,
@@ -85,6 +84,22 @@ let HandleDeleteTicket = async (req, res) => {
 		...message,
 	});
 };
+let HandleCreateTime = async (req, res) => {
+	const { license_plate } = req.body;
+	if (!license_plate) {
+		return res.status(400).send("Is Not License Plate");
+	}
+	try {
+		let result = await apiService.CreateTimeCar(license_plate);
+		return res.status(200).json({
+			errCode: result.errCode,
+			errMessage: result.errMessage,
+		});
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ errCode: 1, errMessage: "Error Car" });
+	}
+};
 module.exports = {
 	HandleCreateNewCar: HandleCreateNewCar,
 	HandleGetAllCar: HandleGetAllCar,
@@ -92,4 +107,5 @@ module.exports = {
 	HandleGetTypeTicket: HandleGetTypeTicket,
 	HandleCreatePayment: HandleCreatePayment,
 	HandleDeleteTicket: HandleDeleteTicket,
+	HandleCreateTime: HandleCreateTime,
 };
