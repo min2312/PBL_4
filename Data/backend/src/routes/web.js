@@ -23,6 +23,10 @@ let initWebRoutes = (app) => {
 	router.post("/api/delete-ticket", apiController.HandleDeleteTicket);
 	router.post("/api/createTime", apiController.HandleCreateTime);
 	router.delete("/api/delete-user", userController.HandleDeleteUser);
+	router.post("/payment", apiController.HandlePaymentMoMo);
+	router.post("/payment/ZaloPay", apiController.handlePaymentZaloPay);
+	router.post("/payment/CheckZaloPay", apiController.handleCheckZaloPay);
+	router.post("/callback", apiController.handleCallBackZaloPay);
 	return app.use("/", router);
 };
 
