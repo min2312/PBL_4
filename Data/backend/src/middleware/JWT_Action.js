@@ -7,6 +7,10 @@ const nonSecurePaths = [
 	"/api/logout",
 	"/api/admin_login",
 	"/api/createTime",
+	"/payment",
+	"/payment/ZaloPay",
+	"/payment/CheckZaloPay",
+	"/callback",
 ];
 
 const CreateJWT = (payload) => {
@@ -32,7 +36,10 @@ const verifyToken = (token) => {
 };
 
 const checkUserJWT = (req, res, next) => {
-	if (nonSecurePaths.includes(req.path)) {
+	const isNgrokRequest =
+		req.headers["x-forwarded-host"] &&
+		req.headers["x-forwarded-host"].includes("ngrok.io");
+	if (nonSecurePaths.includes(req.path) || isNgrokRequest) {
 		return next();
 	}
 	let cookies = req.cookies;
