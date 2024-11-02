@@ -3,6 +3,11 @@ import db, { Sequelize } from "../models/index";
 import { Op, where } from "sequelize";
 import { response } from "express";
 import { getAllUser } from "../service/userService";
+const crypto = require("crypto");
+const CryptoJS = require("crypto-js");
+const moment = require("moment");
+const qs = require("qs");
+const axios = require("axios");
 require("dotenv").config();
 
 let CreateNewCar = (data, user) => {
@@ -140,16 +145,17 @@ let GetCar_Ticket = (id_user) => {
 let DeleteTicket = (id_car) => {
 	return new Promise(async (resolve, reject) => {
 		try {
+			let carId = typeof id_car === "object" ? Object.keys(id_car)[0] : id_car;
 			let payment = await db.Payment.findOne({
-				where: { id_car: id_car },
+				where: { id_car: carId },
 			});
 			if (payment) {
 				await db.Payment.destroy({
-					where: { id_car: id_car },
+					where: { id_car: carId },
 				});
 				await db.Car.update(
 					{ id_reservation: null, inTime: null, outTime: null },
-					{ where: { id_car: id_car } }
+					{ where: { id_car: carId } }
 				);
 				resolve({
 					errCode: 0,
@@ -404,6 +410,164 @@ let CheckLicensePlate = (LicensePlate) => {
 		}
 	});
 };
+
+let PaymentMoMo = (amount) => {
+	const accessKey = "F8BBA842ECF85";
+	const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+	const partnerCode = "MOMO";
+	const redirectUrl =
+		"https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
+	const ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b";
+	const requestType = "payWithMethod";
+	return new Promise((resolve, reject) => {
+		const orderId = partnerCode + new Date().getTime();
+		const requestId = orderId;
+		const extraData = "";
+		const orderInfo = "pay with MoMo";
+		const paymentCode =
+			"T8Qii53fAXyUftPV3m9ysyRhEanUs9KlOPfHgpMR0ON50U10Bh+vZdpJU7VY4z+Z2y77fJHkoDc69scwwzLuW5MzeUKTwPo3ZMaB29imm6YulqnWfTkgzqRaion+EuD7FN9wZ4aXE1+mRt0gHsU193y+yxtRgpmY7SDMU9hCKoQtYyHsfFR5FUAOAKMdw2fzQqpToei3rnaYvZuYaxolprm9+/+WIETnPUDlxCYOiw7vPeaaYQQH0BF0TxyU3zu36ODx980rJvPAgtJzH1gUrlxcSS1HQeQ9ZaVM1eOK/jl8KJm6ijOwErHGbgf/hVymUQG65rHU2MWz9U8QUjvDWA==";
+		// Tạo raw signature
+		const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+		const signature = crypto
+			.createHmac("sha256", secretKey)
+			.update(rawSignature)
+			.digest("hex");
+
+		// Tạo body yêu cầu JSON
+		const requestBody = {
+			partnerCode,
+			partnerName: "Test",
+			storeId: "MomoTestStore",
+			requestId,
+			amount,
+			orderId,
+			orderInfo,
+			redirectUrl,
+			ipnUrl,
+			lang: "vi",
+			requestType,
+			autoCapture: true,
+			extraData,
+			orderGroupId: "",
+			signature,
+		};
+
+		// Gọi API với axios
+		axios
+			.post("https://test-payment.momo.vn/v2/gateway/api/create", requestBody, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+			})
+			.then((response) => {
+				resolve(response.data);
+			})
+			.catch((error) => {
+				reject(error);
+			});
+	});
+};
+
+const createZaloPayOrder = async (orderDetails) => {
+	let cars = await GetCar_Ticket(`${orderDetails.id_user}`);
+	const foundCar = cars.find(
+		(car) => car.license_plate === orderDetails.licenseplate
+	);
+	const embed_data = {
+		redirecturl: `http://localhost:3000/ProcessPayment?id_car=${foundCar.id_car}`,
+	};
+	const config = {
+		app_id: "2553",
+		key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+		key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+		endpoint: "https://sb-openapi.zalopay.vn/v2/create",
+	};
+	const transID = Math.floor(Math.random() * 1000000);
+	const order = {
+		app_id: config.app_id,
+		app_trans_id: `${moment().format("YYMMDD")}_${transID}`,
+		app_user: orderDetails.fullName || "user123",
+		app_time: Date.now(),
+		item: JSON.stringify(orderDetails.items || []),
+		embed_data: JSON.stringify(embed_data),
+		amount: orderDetails.price || 50000,
+		callback_url:
+			"https://e983-2001-ee0-4b74-a210-b3fb-e93b-bd97-6202.ngrok-free.app/callback",
+		description: `ZaloPay - Payment for the order #${transID}`,
+		bank_code: "",
+	};
+
+	const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
+	order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+
+	try {
+		const result = await axios.post(config.endpoint, null, { params: order });
+		return result.data;
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+};
+const callbackZaloPayOrder = async (body) => {
+	const config = {
+		app_id: "2553",
+		key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+		key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+	};
+	let result = {};
+	let dataStr = body.data;
+	let reqMac = body.mac;
+	let mac = CryptoJS.HmacSHA256(dataStr, config.key2).toString();
+	console.log("mac =", mac);
+
+	if (reqMac !== mac) {
+		// Callback không hợp lệ
+		result.return_code = -1;
+		result.return_message = "mac not equal";
+	} else {
+		let dataJson = JSON.parse(dataStr);
+		console.log(
+			"update order's status = success where app_trans_id =",
+			dataJson["app_trans_id"]
+		);
+
+		result.return_code = 1;
+		result.return_message = "success";
+	}
+
+	return result;
+};
+const checkZaloPayOrderStatus = async (app_trans_id) => {
+	const config = {
+		app_id: "2553",
+		key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+		key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+		endpoint: "https://sb-openapi.zalopay.vn/v2/query",
+	};
+
+	let postData = {
+		app_id: config.app_id,
+		app_trans_id: app_trans_id,
+	};
+
+	let data = postData.app_id + "|" + postData.app_trans_id + "|" + config.key1; // appid|app_trans_id|key1
+	postData.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+	let postConfig = {
+		method: "post",
+		url: config.endpoint,
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded",
+		},
+		data: qs.stringify(postData),
+	};
+	try {
+		const response = await axios(postConfig);
+		return response.data;
+	} catch (error) {
+		console.error("Error checking order status:", error);
+		throw error;
+	}
+};
 module.exports = {
 	CreateNewCar,
 	GetAllCar,
@@ -413,4 +577,8 @@ module.exports = {
 	CreatePayment,
 	GetCar_Ticket,
 	CreateTimeCar,
+	PaymentMoMo,
+	createZaloPayOrder,
+	checkZaloPayOrderStatus,
+	callbackZaloPayOrder,
 };
