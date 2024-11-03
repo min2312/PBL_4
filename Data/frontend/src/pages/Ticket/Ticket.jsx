@@ -110,7 +110,6 @@ const Ticket = () => {
 				<h2>Manage Ticket</h2>
 			</div>
 			<table id="customers">
-				{console.log(userTicket)}
 				<tbody>
 					<tr>
 						<th>STT</th>
