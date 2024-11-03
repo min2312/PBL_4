@@ -9,6 +9,7 @@ import Login_Admin from "../pages/Admin/Login_Admin";
 import Ticket from "../pages/Ticket/Ticket";
 import InfoCar from "../Component/InfoCar/InfoCar";
 import Add_Ticket from "../pages/Ticket/Add_Ticket";
+import PaymentCall from "../pages/Ticket/PaymentCall";
 const ClientRoute = () => {
 	return (
 		<div>
@@ -17,6 +18,7 @@ const ClientRoute = () => {
 				<PrivateRoutes path="/ticket" exact component={Ticket} />
 				<PrivateRoutes path="/info-car/id=:id_user" component={InfoCar} />
 				<PrivateRoutes path="/ticket/create" component={Add_Ticket} />
+				<PrivateRoutes path="/ProcessPayment" component={PaymentCall} />
 				<Route path="/admin">
 					<Login_Admin />
 				</Route>
