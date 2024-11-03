@@ -36,6 +36,12 @@ const CreateTicket = async (data) => {
 const DeleteTicket = async (data) => {
 	return axios.post("/api/delete-ticket", data);
 };
+const PaymentZaloPay = async (user) => {
+	return axios.post("/payment/ZaloPay", user);
+};
+const CheckPayment = async (apptransid) => {
+	return axios.post("/payment/CheckZaloPay", { app_trans_id: apptransid });
+};
 export {
 	CreateNewCar,
 	getAllCar,
@@ -43,4 +49,6 @@ export {
 	getTypeTicket,
 	CreateTicket,
 	DeleteTicket,
+	PaymentZaloPay,
+	CheckPayment,
 };
