@@ -4,7 +4,11 @@ import {
 	useLocation,
 } from "react-router-dom/cjs/react-router-dom.min";
 import { GetAllUser } from "../../services/userService";
-import { CreateTicket, getTypeTicket } from "../../services/apiService";
+import {
+	CreateTicket,
+	getTypeTicket,
+	PaymentZaloPay,
+} from "../../services/apiService";
 import { UserContext } from "../../Context/UserProvider";
 import { getAllCar } from "../../services/apiService";
 import { toast } from "react-toastify";
@@ -106,13 +110,6 @@ const Add_Ticket = () => {
 		setSelectedTicketType(selectedValue);
 		if (selectedValue !== "Choose...") {
 			let ticket = await getTypeTicket(selectedValue);
-			if (userCar.some((car) => car.license_plate === selectedValue)) {
-				setFormValues({
-					...formValues,
-					licenseplate: selectedValue,
-				});
-				return;
-			}
 			let expirationDate = new Date();
 			if (selectedValue === "Day") {
 				expirationDate.setDate(expirationDate.getDate() + 1);
@@ -122,18 +119,34 @@ const Add_Ticket = () => {
 				expirationDate.setFullYear(expirationDate.getFullYear() + 1);
 			}
 			const formattedDate = formatDateForDisplay(expirationDate);
-			setFormValues({
-				...formValues,
-				type: ticket.type,
-				price: ticket.price,
-				paymentDate: formattedDate,
-			});
+			if (!formValues.type) {
+				setFormValues({
+					...formValues,
+					type: ticket.type,
+					price: ticket.price,
+					paymentDate: formattedDate,
+				});
+			}
 		} else {
 			setFormValues({
 				...formValues,
 				type: "",
 				price: "",
 				paymentDate: "",
+			});
+		}
+	};
+	const handleSelectLicensePlate = (e) => {
+		const selectedValue = e.target.value;
+		if (selectedValue === "Choose...") {
+			setFormValues({
+				...formValues,
+				licenseplate: "",
+			});
+		} else if (userCar.some((car) => car.license_plate === selectedValue)) {
+			setFormValues({
+				...formValues,
+				licenseplate: selectedValue,
 			});
 		}
 	};
@@ -155,8 +168,10 @@ const Add_Ticket = () => {
 		try {
 			let response = await CreateTicket(formValues);
 			if (response && response.errCode === 0) {
-				toast.success(response.errMessage);
-				history.push("/ticket");
+				let payment = await PaymentZaloPay(formValues);
+				if (payment && payment.return_code === 1) {
+					window.location.href = payment.order_url;
+				}
 			} else {
 				toast.error(response.errMessage);
 			}
@@ -235,7 +250,10 @@ const Add_Ticket = () => {
 							<div className="input-group-prepend">
 								<span className="input-group-text fw-bold">License Plate:</span>
 							</div>
-							<select className="form-select" onChange={HandleSelectType}>
+							<select
+								className="form-select"
+								onChange={handleSelectLicensePlate}
+							>
 								<option defaultValue>Choose...</option>
 								{userCar &&
 									userCar.length > 0 &&
