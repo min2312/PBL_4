@@ -42,6 +42,16 @@ const PaymentZaloPay = async (user) => {
 const CheckPayment = async (apptransid) => {
 	return axios.post("/payment/CheckZaloPay", { app_trans_id: apptransid });
 };
+const GetSlotCar = async () => {
+	let response = await axios.get("/api/get-all-slot");
+	if (response.errCode === 0) {
+		return response.slots;
+	}
+};
+const UpdateSlot = async (data) => {
+	let response = await axios.post("/api/updateSlot", { data });
+	return response;
+};
 export {
 	CreateNewCar,
 	getAllCar,
@@ -51,4 +61,6 @@ export {
 	DeleteTicket,
 	PaymentZaloPay,
 	CheckPayment,
+	GetSlotCar,
+	UpdateSlot,
 };
