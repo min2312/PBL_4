@@ -165,6 +165,23 @@ let handleCallBackZaloPay = async (req, res) => {
 		});
 	}
 };
+let HandleGetAllSlot = async (req, res) => {
+	let slots = await apiService.getSlotCar();
+	return res.status(200).json({
+		errCode: 0,
+		errMessage: "OK",
+		slots,
+	});
+};
+let UpdateSlot = async (req, res) => {
+	let { data } = req.body;
+	console.log("control", data);
+	let check = await apiService.updateSlot(data);
+	return res.status(200).json({
+		errCode: check.errCode,
+		errMessage: check.errMessage,
+	});
+};
 module.exports = {
 	HandleCreateNewCar: HandleCreateNewCar,
 	HandleGetAllCar: HandleGetAllCar,
@@ -177,4 +194,6 @@ module.exports = {
 	handlePaymentZaloPay: handlePaymentZaloPay,
 	handleCheckZaloPay: handleCheckZaloPay,
 	handleCallBackZaloPay: handleCallBackZaloPay,
+	HandleGetAllSlot: HandleGetAllSlot,
+	UpdateSlot: UpdateSlot,
 };

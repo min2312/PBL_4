@@ -3,6 +3,8 @@ import db, { Sequelize } from "../models/index";
 import { Op, where } from "sequelize";
 import { response } from "express";
 import { getAllUser } from "../service/userService";
+import { resolve } from "path";
+import { rejects } from "assert";
 const crypto = require("crypto");
 const CryptoJS = require("crypto-js");
 const moment = require("moment");
@@ -568,6 +570,39 @@ const checkZaloPayOrderStatus = async (app_trans_id) => {
 		throw error;
 	}
 };
+let getSlotCar = () => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let slots = await db.ParkingSpot.findAll();
+			resolve(slots);
+		} catch (e) {
+			reject(e);
+		}
+	});
+};
+let updateSlot = (data) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let match = data.match(/([A-Z]+)(\d+)/);
+			if (match) {
+				let status = match[1]; // Chữ
+				let number = match[2]; // Số
+				let slots = await db.ParkingSpot.update(
+					{
+						status: status,
+					},
+					{ where: { id_parkingspot: number }, silent: false }
+				);
+				resolve({
+					errCode: 0,
+					errMessage: "OK",
+				});
+			}
+		} catch (e) {
+			reject(e);
+		}
+	});
+};
 module.exports = {
 	CreateNewCar,
 	GetAllCar,
@@ -581,4 +616,6 @@ module.exports = {
 	createZaloPayOrder,
 	checkZaloPayOrderStatus,
 	callbackZaloPayOrder,
+	getSlotCar,
+	updateSlot,
 };
