@@ -83,7 +83,15 @@ while True:
                     break
             if flag == 1:
                 break
-    
+    # try:
+    #     msg = ws.recv()  
+    #     print("Nhận thông điệp từ WebSocket:", msg)
+    #     if msg == "active" or msg == "unactive":
+    #         print(f"Cập nhật cơ sở dữ liệu với trạng thái: {msg}") 
+    # except websocket.WebSocketConnectionClosedException:
+    #     print("Kết nối WebSocket đã đóng")
+    #     break
+
     # Hiển thị FPS
     new_frame_time = time.time()
     fps = 1 / (new_frame_time - prev_frame_time)
