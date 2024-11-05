@@ -45,6 +45,11 @@ const NavBar = () => {
 												Users
 											</button>
 										</Link>
+										<Link className="nav-link" to="/SlotCar">
+											<button className="btn btn-outline-warning" type="button">
+												Slot Parking
+											</button>
+										</Link>
 										<Link className="nav-link" to="/ticket">
 											<button className="btn btn-outline-warning" type="button">
 												Tickets

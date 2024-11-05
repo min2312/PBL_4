@@ -10,6 +10,7 @@ import Ticket from "../pages/Ticket/Ticket";
 import InfoCar from "../Component/InfoCar/InfoCar";
 import Add_Ticket from "../pages/Ticket/Add_Ticket";
 import PaymentCall from "../pages/Ticket/PaymentCall";
+import Slot_Car from "../Component/Slot_Car/Slot_Car";
 const ClientRoute = () => {
 	return (
 		<div>
@@ -19,6 +20,7 @@ const ClientRoute = () => {
 				<PrivateRoutes path="/info-car/id=:id_user" component={InfoCar} />
 				<PrivateRoutes path="/ticket/create" component={Add_Ticket} />
 				<PrivateRoutes path="/ProcessPayment" component={PaymentCall} />
+				<PrivateRoutes path="/SlotCar" component={Slot_Car} />
 				<Route path="/admin">
 					<Login_Admin />
 				</Route>
