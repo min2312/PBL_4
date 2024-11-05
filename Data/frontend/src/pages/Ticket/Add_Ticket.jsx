@@ -119,14 +119,12 @@ const Add_Ticket = () => {
 				expirationDate.setFullYear(expirationDate.getFullYear() + 1);
 			}
 			const formattedDate = formatDateForDisplay(expirationDate);
-			if (!formValues.type) {
-				setFormValues({
-					...formValues,
-					type: ticket.type,
-					price: ticket.price,
-					paymentDate: formattedDate,
-				});
-			}
+			setFormValues({
+				...formValues,
+				type: ticket.type,
+				price: ticket.price,
+				paymentDate: formattedDate,
+			});
 		} else {
 			setFormValues({
 				...formValues,
