@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { GetSlotCar, UpdateSlot } from "../../services/apiService";
+import { GetSlotCar } from "../../services/apiService";
 
 const Slot_Car = () => {
 	const [slots, setSlots] = useState([]);
-	const [slotStatus, setSlotStatus] = useState("");
 	const fetchSlots = async () => {
 		try {
 			let slotCar = await GetSlotCar();
@@ -12,29 +11,11 @@ const Slot_Car = () => {
 			console.error("Failed to fetch slots:", error);
 		}
 	};
-	const updateSlot = async () => {
-		try {
-			let rs = await UpdateSlot(slotStatus);
-			if (rs && rs.errCode === 0) {
-				fetchSlots();
-			}
-		} catch (error) {
-			console.error("Failed to update slots:", error);
-		}
-	};
+
 	useEffect(() => {
 		fetchSlots();
-		const ws = new WebSocket("ws://192.168.1.10:81");
-		ws.onmessage = (event) => {
-			setSlotStatus(event.data);
-		};
-		return () => ws.close();
-	}, []);
-	useEffect(() => {
-		if (slotStatus) {
-			updateSlot();
-		}
-	}, [slotStatus]);
+	}, [slots]);
+
 	return (
 		<>
 			<div className="title text-center">
