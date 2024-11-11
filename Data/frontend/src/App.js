@@ -1,4 +1,4 @@
-import { Fragment, useContext } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import "./App.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -8,8 +8,29 @@ import NavBar from "./Component/NavBar/NavBar";
 import { Oval } from "react-loader-spinner";
 import { UserContext } from "./Context/UserProvider";
 import Footer from "./Component/Common/Footer/Footer";
+import { UpdateSlot } from "./services/apiService";
+import { closeWebSocket, connectWebSocket } from "./setup/Websocket";
 function App() {
 	const { user } = useContext(UserContext);
+	const [slotStatus, setSlotStatus] = useState("");
+	useEffect(() => {
+		connectWebSocket(setSlotStatus);
+		return () => {
+			closeWebSocket();
+		};
+	}, []);
+	const updateSlot = async () => {
+		try {
+			let rs = await UpdateSlot(slotStatus);
+		} catch (error) {
+			console.error("Failed to update slots:", error);
+		}
+	};
+	useEffect(() => {
+		if (slotStatus) {
+			updateSlot();
+		}
+	}, [slotStatus]);
 	return (
 		<Fragment>
 			<Router>
