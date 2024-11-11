@@ -287,6 +287,9 @@ let CreateTimeCar = (LicensePlate) => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			let check = await CheckLicensePlate(LicensePlate);
+			let checkslot = await db.ParkingSpot.findAll({
+				where: { status: "INACTIVE" },
+			});
 			if (check) {
 				let car = await db.Car.findOne({
 					where: { license_plate: LicensePlate },
@@ -310,65 +313,68 @@ let CreateTimeCar = (LicensePlate) => {
 								errCode: 2,
 								errMessage: "Expired Ticket",
 							});
-						}
-					}
-					if (!car.inTime) {
-						await db.Car.update(
-							{
-								inTime: recentCheck,
-							},
-							{ where: { id_car: car.id_car } }
-						);
-						resolve({
-							errCode: 0,
-							errMessage: car.license_plate,
-						});
-					} else if (!car.outTime) {
-						await db.Car.update(
-							{
-								outTime: recentCheck,
-							},
-							{ where: { id_car: car.id_car } }
-						);
-						resolve({
-							errCode: 0,
-							errMessage: `Good Bye-${car.license_plate}`,
-						});
-					} else {
-						if (car.inTime > car.outTime) {
-							await db.Car.update(
-								{
-									outTime: recentCheck,
-								},
-								{ where: { id_car: car.id_car } }
-							);
-							resolve({
-								errCode: 0,
-								errMessage: `Good Bye-${car.license_plate}`,
-							});
 						} else {
-							let carTicket = await GetCar_Ticket(`${car.id_user}`);
-							if (carTicket.length > 0) {
-								let expiredCar = carTicket.find(
-									(ticket) => ticket.license_plate === car.license_plate
-								);
-								if (expiredCar.paymentDate < recentCheck) {
+							if (!car.inTime) {
+								if (checkslot.length === 0) {
 									resolve({
-										errCode: 2,
-										errMessage: "Expired Ticket",
+										errCode: 3,
+										errMessage: "FULL SLOT. WAIT",
+									});
+								} else {
+									await db.Car.update(
+										{
+											inTime: recentCheck,
+										},
+										{ where: { id_car: car.id_car } }
+									);
+									resolve({
+										errCode: 0,
+										errMessage: car.license_plate,
 									});
 								}
+							} else if (!car.outTime) {
+								await db.Car.update(
+									{
+										outTime: recentCheck,
+									},
+									{ where: { id_car: car.id_car } }
+								);
+								resolve({
+									errCode: 0,
+									errMessage: `Good Bye-${car.license_plate}`,
+								});
+							} else {
+								if (car.inTime > car.outTime) {
+									await db.Car.update(
+										{
+											outTime: recentCheck,
+										},
+										{ where: { id_car: car.id_car } }
+									);
+									resolve({
+										errCode: 0,
+										errMessage: `Good Bye-${car.license_plate}`,
+									});
+								} else {
+									if (checkslot.length === 0) {
+										resolve({
+											errCode: 3,
+											errMessage: "FULL SLOT. WAIT",
+										});
+									} else {
+										await db.Car.update(
+											{
+												inTime: recentCheck,
+											},
+											{ where: { id_car: car.id_car } }
+										);
+										resolve({
+											errCode: 0,
+											errMessage: car.license_plate,
+										});
+									}
+								}
 							}
-							await db.Car.update(
-								{
-									inTime: recentCheck,
-								},
-								{ where: { id_car: car.id_car } }
-							);
-							resolve({
-								errCode: 0,
-								errMessage: car.license_plate,
-							});
 						}
 					}
 				}
