@@ -50,11 +50,11 @@ const NavBar = () => {
 												Slot Parking
 											</button>
 										</Link>
-										<Link className="nav-link" to="/ticket">
+										{/* <Link className="nav-link" to="/ticket">
 											<button className="btn btn-outline-warning" type="button">
 												Tickets
 											</button>
-										</Link>
+										</Link> */}
 										<NavDropdown
 											title={`Welcome, ${user.account.fullName || "Admin"}`}
 											className="NavDropdown mt-1"

@@ -138,6 +138,9 @@ const Users = () => {
 			console.log(e);
 		}
 	};
+	const HandleAddMoney = () => {
+		history.push("/Account/DepositMoney");
+	};
 	return (
 		<div className="user-container">
 			<Modal_User
@@ -176,6 +179,7 @@ const Users = () => {
 							<th>Email</th>
 							<th>FullName</th>
 							<th>Phone Number</th>
+							<th>Money</th>
 							<th className="px-5">Action</th>
 							<th>Car Information</th>
 						</tr>
@@ -188,6 +192,12 @@ const Users = () => {
 										<td>{item.email}</td>
 										<td>{item.fullName}</td>
 										<td>{item.phone}</td>
+										{item.price ? (
+											<td>{item.price}</td>
+										) : (
+											<td className="text-danger">0</td>
+										)}
+
 										<td>
 											<button
 												className="btn btn-outline-light text-warning mx-2"
@@ -215,6 +225,12 @@ const Users = () => {
 							})}
 					</tbody>
 				</table>
+				<button
+					className="btn btn-success mt-5 ms-5"
+					onClick={() => HandleAddMoney()}
+				>
+					Add Money
+				</button>
 			</div>
 		</div>
 	);
