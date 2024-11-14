@@ -52,6 +52,12 @@ const UpdateSlot = async (data) => {
 	let response = await axios.post("/api/updateSlot", { data });
 	return response;
 };
+const MoneyDeposit = async (data) => {
+	return axios.post("/api/deposit-money", data);
+};
+const CancelDeposit = async (data) => {
+	return axios.post("/api/cancel-deposit", data);
+};
 export {
 	CreateNewCar,
 	getAllCar,
@@ -63,4 +69,6 @@ export {
 	CheckPayment,
 	GetSlotCar,
 	UpdateSlot,
+	MoneyDeposit,
+	CancelDeposit,
 };
