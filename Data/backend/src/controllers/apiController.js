@@ -72,6 +72,36 @@ let HandleCreatePayment = async (req, res) => {
 			.json({ errCode: 1, errMessage: "Error Create Ticket" });
 	}
 };
+let HandleDepositMoney = async (req, res) => {
+	let data = req.body;
+	try {
+		const result = await apiService.DepositMoney(data);
+		return res.status(200).json({
+			errCode: result.errCode,
+			errMessage: result.errMessage,
+		});
+	} catch (error) {
+		console.error(error);
+		return res
+			.status(500)
+			.json({ errCode: 1, errMessage: "Error Deposit Money" });
+	}
+};
+let CancelDepositMoney = async (req, res) => {
+	let data = req.body;
+	try {
+		const result = await apiService.CancelDeposit(data);
+		return res.status(200).json({
+			errCode: result.errCode,
+			errMessage: result.errMessage,
+		});
+	} catch (error) {
+		console.error(error);
+		return res
+			.status(500)
+			.json({ errCode: 1, errMessage: "Error Cancel Deposit Money" });
+	}
+};
 let HandleDeleteTicket = async (req, res) => {
 	if (!req.body) {
 		return res.status(200).json({
@@ -91,6 +121,22 @@ let HandleCreateTime = async (req, res) => {
 	}
 	try {
 		let result = await apiService.CreateTimeCar(license_plate);
+		return res.status(200).json({
+			errCode: result.errCode,
+			errMessage: result.errMessage,
+		});
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ errCode: 1, errMessage: "Error Car" });
+	}
+};
+let HandleCheckTime = async (req, res) => {
+	const { license_plate } = req.body;
+	if (!license_plate) {
+		return res.status(400).send("Is Not License Plate");
+	}
+	try {
+		let result = await apiService.CheckTimeCar(license_plate);
 		return res.status(200).json({
 			errCode: result.errCode,
 			errMessage: result.errMessage,
@@ -196,4 +242,7 @@ module.exports = {
 	handleCallBackZaloPay: handleCallBackZaloPay,
 	HandleGetAllSlot: HandleGetAllSlot,
 	UpdateSlot: UpdateSlot,
+	HandleDepositMoney: HandleDepositMoney,
+	CancelDepositMoney: CancelDepositMoney,
+	HandleCheckTime: HandleCheckTime,
 };

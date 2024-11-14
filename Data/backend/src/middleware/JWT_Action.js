@@ -12,6 +12,7 @@ const nonSecurePaths = [
 	"/payment/CheckZaloPay",
 	"/callback",
 	"/api/updateSlot",
+	"/api/checkTime",
 ];
 
 const CreateJWT = (payload) => {

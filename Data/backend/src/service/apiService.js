@@ -174,6 +174,25 @@ let DeleteTicket = (id_car) => {
 		}
 	});
 };
+let CancelDeposit = (data) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let user = await db.User.findOne({
+				where: { id: data.id_user },
+			});
+			let money = parseFloat(user.price) - parseFloat(data.amount);
+			if (user.price) {
+				await db.User.update({ price: money }, { where: { id: data.id_user } });
+			}
+			resolve({
+				errCode: 0,
+				errMessage: `Cancel Deposit Money`,
+			});
+		} catch (e) {
+			reject(e);
+		}
+	});
+};
 let DeleteCar = (User_id) => {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -389,6 +408,126 @@ let CreateTimeCar = (LicensePlate) => {
 		}
 	});
 };
+let CheckTimeCar = (LicensePlate) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let check = await db.Car.findOne({
+				where: { license_plate: LicensePlate },
+			});
+			let checkslot = await db.ParkingSpot.findAll({
+				where: { status: "INACTIVE" },
+			});
+			if (!check) {
+				resolve({
+					errCode: 1,
+					errMessage: "Car Not Exist",
+				});
+				return;
+			}
+			const recentCheck = new Date();
+			recentCheck.setHours(recentCheck.getHours() + 7);
+			if (!check.inTime) {
+				if (checkslot.length === 0) {
+					resolve({
+						errCode: 3,
+						errMessage: "FULL SLOT. WAIT",
+					});
+				} else {
+					await db.Car.update(
+						{ inTime: recentCheck },
+						{ where: { id_car: check.id_car } }
+					);
+					resolve({
+						errCode: 0,
+						errMessage: check.license_plate,
+					});
+				}
+			} else if (!check.outTime) {
+				// Tính thời gian đỗ xe
+				let inTime = new Date(check.inTime);
+				let duration = (recentCheck - inTime) / (1000 * 60 * 60); // Thời gian đỗ xe tính bằng giờ
+				// Tính phí đỗ xe
+				let price = 5000;
+				if (duration > 1) {
+					price += Math.ceil(duration - 1) * 5000;
+				}
+				let user = await db.User.findOne({ where: { id: check.id_user } });
+				if (user && user.price >= price) {
+					let money = parseFloat(user.price) - parseFloat(price);
+					await db.Car.update(
+						{ outTime: recentCheck },
+						{ where: { id_car: check.id_car } }
+					);
+					await db.User.update(
+						{ price: money },
+						{ where: { id: check.id_user } }
+					);
+					resolve({
+						errCode: 0,
+						errMessage: `Good Bye-${check.license_plate}\nFee: ${price} VND`,
+					});
+				} else {
+					resolve({
+						errCode: 4,
+						errMessage: "Not Enough Money",
+					});
+				}
+			} else {
+				if (check.inTime > check.outTime) {
+					// Tính thời gian đỗ xe
+					let inTime = new Date(check.inTime);
+					let duration = (recentCheck - inTime) / (1000 * 60 * 60); // Thời gian đỗ xe tính bằng giờ
+					// Tính phí đỗ xe
+					let price = 5000;
+					if (duration > 1) {
+						price += Math.ceil(duration - 1) * 5000;
+					}
+					let user = await db.User.findOne({ where: { id: check.id_user } });
+					if (user && user.price >= price) {
+						let money = parseFloat(user.price) - parseFloat(price);
+						await db.Car.update(
+							{ outTime: recentCheck },
+							{ where: { id_car: check.id_car } }
+						);
+						await db.User.update(
+							{ price: money },
+							{ where: { id: check.id_user } }
+						);
+						resolve({
+							errCode: 0,
+							errMessage: `Good Bye-${check.license_plate}\nFee: ${price} VND`,
+						});
+					} else {
+						resolve({
+							errCode: 4,
+							errMessage: "Not Enough Money",
+						});
+					}
+				} else {
+					if (checkslot.length === 0) {
+						resolve({
+							errCode: 3,
+							errMessage: "FULL SLOT. WAIT",
+						});
+					} else {
+						await db.Car.update(
+							{
+								inTime: recentCheck,
+							},
+							{ where: { id_car: check.id_car } }
+						);
+						resolve({
+							errCode: 0,
+							errMessage: check.license_plate,
+						});
+					}
+				}
+			}
+		} catch (error) {
+			reject(error);
+		}
+	});
+};
 
 let CheckLicensePlate = (LicensePlate) => {
 	return new Promise(async (resolve, reject) => {
@@ -477,12 +616,8 @@ let PaymentMoMo = (amount) => {
 };
 
 const createZaloPayOrder = async (orderDetails) => {
-	let cars = await GetCar_Ticket(`${orderDetails.id_user}`);
-	const foundCar = cars.find(
-		(car) => car.license_plate === orderDetails.licenseplate
-	);
 	const embed_data = {
-		redirecturl: `http://localhost:3000/ProcessPayment?id_car=${foundCar.id_car}`,
+		redirecturl: `http://localhost:3000/ProcessPayment?id_user=${orderDetails.id_user}`,
 	};
 	const config = {
 		app_id: "2553",
@@ -609,6 +744,40 @@ let updateSlot = (data) => {
 		}
 	});
 };
+
+let DepositMoney = (data) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let user = await db.User.findOne({
+				where: { id: data.id_user },
+			});
+			let money = parseFloat(user.price) + parseFloat(data.price);
+			if (user.price) {
+				await db.User.update(
+					{
+						price: money,
+					},
+					{
+						where: { id: data.id_user },
+					}
+				);
+			} else {
+				await db.User.update(
+					{ price: data.price },
+					{
+						where: { id: data.id_user },
+					}
+				);
+			}
+			resolve({
+				errCode: 0,
+				errMessage: "Deposit Money successfully.",
+			});
+		} catch (e) {
+			reject(e);
+		}
+	});
+};
 module.exports = {
 	CreateNewCar,
 	GetAllCar,
@@ -624,4 +793,7 @@ module.exports = {
 	callbackZaloPayOrder,
 	getSlotCar,
 	updateSlot,
+	DepositMoney,
+	CancelDeposit,
+	CheckTimeCar,
 };
