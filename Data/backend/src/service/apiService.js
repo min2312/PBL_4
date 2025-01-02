@@ -500,7 +500,7 @@ let CheckTimeCar = (LicensePlate) => {
 					} else {
 						resolve({
 							errCode: 4,
-							errMessage: "Not Enough Money",
+							errMessage: `Not Enough Money\nFee: ${price} VND`,
 						});
 					}
 				} else {

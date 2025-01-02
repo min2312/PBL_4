@@ -9,20 +9,20 @@ import websocket
 import requests
 
 # Tải mô hình YOLO
-yolo_LP_detect = torch.hub.load('yolov5', 'custom', path='model/lp_detect.onnx', force_reload=True, source='local')
+yolo_LP_detect = torch.hub.load('yolov5', 'custom', path='model/LP.onnx', force_reload=True, source='local')
 yolo_license_plate = torch.hub.load('yolov5', 'custom', path='model/lp_read.onnx', force_reload=True, source='local')
 yolo_LP_detect.conf = 0.50
-yolo_license_plate.conf = 0.60
+yolo_license_plate.conf = 0.50
 
 # Kết nối đến WebSocket của ESP8266
-ws = websocket.create_connection("ws://192.168.43.206:81")  # Địa chỉ IP của ESP8266
+ws = websocket.create_connection("ws://192.168.1.14:81")  # Địa chỉ IP của ESP8266
 
 previous_plate = ""
 count = 0
 required_count = 5
 
 # URL camera IP
-url = 'http://192.168.43.70/cam-hi.jpg'
+url = 'http://192.168.1.13/cam-hi.jpg'
 
 prev_frame_time = 0
 new_frame_time = 0
@@ -75,22 +75,16 @@ while True:
 
                     if count == required_count:
                         print(f"Gửi biển số xe: {lp} qua ESP8266")
-                        response = requests.post("http://localhost:8081/api/createTime", json={"license_plate": lp})
+                        response = requests.post("http://localhost:8081/api/checkTime", json={"license_plate": lp})
                         data = response.json()
                         ws.send(data['errMessage'])  # Gửi biển số qua WebSocket
                         count = 0
+                        time.sleep(4) 
                     flag = 1
                     break
             if flag == 1:
                 break
-    # try:
-    #     msg = ws.recv()  
-    #     print("Nhận thông điệp từ WebSocket:", msg)
-    #     if msg == "active" or msg == "unactive":
-    #         print(f"Cập nhật cơ sở dữ liệu với trạng thái: {msg}") 
-    # except websocket.WebSocketConnectionClosedException:
-    #     print("Kết nối WebSocket đã đóng")
-    #     break
+    
 
     # Hiển thị FPS
     new_frame_time = time.time()

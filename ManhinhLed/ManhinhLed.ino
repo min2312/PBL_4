@@ -4,8 +4,8 @@
 #include <WebSocketsServer.h>
 #include <Servo.h>
 
-const char* ssid = "Quang Minh";
-const char* password = "khongcanbiet";
+const char* ssid = "Song Hang 22";
+const char* password = "songhang22";
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 WebSocketsServer webSocket = WebSocketsServer(81);
@@ -20,8 +20,8 @@ int trigPins[] = {D6, D3, D7};
 int echoPins[] = {D5, D8, D0};   
 float distances[3];
 bool slotsActive[3] = {false, false, false}; 
-unsigned long previousMillis = 0;  // Thời gian trước đó
-const long interval = 100;  // Khoảng thời gian giữa các lần đo
+unsigned long previousMillis = 0;  
+const long interval = 100;  
 
 void setup() {
   Serial.begin(115200);
@@ -31,15 +31,12 @@ void setup() {
     pinMode(echoPins[i], INPUT);
   }
 
-  // Khởi động LCD
   lcd.init();
   lcd.backlight();
 
-  // Khởi động servo
   myServo.attach(servoPin);
   myServo.write(0);
 
-  // Kết nối WiFi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -48,7 +45,6 @@ void setup() {
   Serial.println("Đã kết nối WiFi!");
   Serial.println(WiFi.localIP());
 
-  // Khởi động WebSocket server
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
 
@@ -58,17 +54,15 @@ void setup() {
 void loop() {
   webSocket.loop();
 
-  // Đo khoảng cách cho từng cảm biến
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;  // Cập nhật thời gian
+    previousMillis = currentMillis;
     
     for (int i = 0; i < 3; i++) {
-      measureDistance(i);  // Đo khoảng cách
+      measureDistance(i);
     }
   }
 
-  // Quản lý servo
   if (servoMoving && (millis() - servoStartTime >= 3000)) {
     myServo.write(0);
     delay(500);
@@ -76,7 +70,6 @@ void loop() {
     message = "";
   }
 
-  // Kiểm tra thông điệp
   if (message.length() > 0 && !servoMoving) {
     if (isLicensePlate(message)) {
       lcd.clear();
@@ -90,20 +83,34 @@ void loop() {
       servoMoving = true;
     } else {
       if (message.startsWith("Good Bye-")) {
-        String licensePlate = message.substring(9);
+        int newlineIndex = message.indexOf('\n');
+        String licensePlate = message.substring(9, newlineIndex); 
+        String feeMessage = message.substring(newlineIndex + 1);
         lcd.clear();
-        lcd.setCursor(2, 0);
-        lcd.print("Good Bye");
-        lcd.setCursor((16 - licensePlate.length()) / 2, 1);
-        lcd.print(licensePlate);
+        lcd.setCursor(0, 0);
+        lcd.print("Bye " + licensePlate);
+        lcd.setCursor(0, 1);
+        lcd.print(feeMessage);
+        // delay(2000); 
         myServo.write(180);
         delay(500);
         servoStartTime = millis();
         servoMoving = true;
-      } else {
+      }else if(message.startsWith("Not Enough Money")){
+          int newlineIndex = message.indexOf('\n');
+          String tb = message.substring(0, newlineIndex); 
+          String feeMessage = message.substring(newlineIndex + 1);
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print(tb);
+          lcd.setCursor(0, 1);
+          lcd.print(feeMessage);
+          message = "";
+      }else {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(message);
+        message = "";
       }
     }
   }
@@ -116,11 +123,11 @@ void measureDistance(int sensorIndex) {
   delayMicroseconds(10);
   digitalWrite(trigPins[sensorIndex], LOW);
 
-  int duration = pulseIn(echoPins[sensorIndex], HIGH, 400000); // Thêm timeout để tránh treo
+  int duration = pulseIn(echoPins[sensorIndex], HIGH, 400000);
   if (duration > 0) {
     distances[sensorIndex] = duration * 0.034 / 2.0;
   } else {
-    distances[sensorIndex] = -1;  // Đánh dấu không có tín hiệu
+    distances[sensorIndex] = -1;
   }
 
   Serial.print("Distance Sensor ");
@@ -129,20 +136,18 @@ void measureDistance(int sensorIndex) {
   Serial.print(distances[sensorIndex]);
   Serial.println(" cm");
 
-  // Kiểm tra và cập nhật trạng thái cảm biến
-  if (distances[sensorIndex] > 0 && distances[sensorIndex] <= 15.0 && !slotsActive[sensorIndex]) {
+  if (distances[sensorIndex] > 0 && distances[sensorIndex] <= 11.0 && !slotsActive[sensorIndex]) {
     slotsActive[sensorIndex] = true;
     String activeMsg = "ACTIVE" + String(sensorIndex + 1); 
     webSocket.broadcastTXT(activeMsg);
     Serial.println("Cập nhật slot " + String(sensorIndex + 1) + ": ACTIVE");
-  } else if (distances[sensorIndex] > 30.0 && slotsActive[sensorIndex]) {
+  } else if (distances[sensorIndex] > 20.0 && slotsActive[sensorIndex]) {
     slotsActive[sensorIndex] = false;
     String inactiveMsg = "INACTIVE" + String(sensorIndex + 1); 
     webSocket.broadcastTXT(inactiveMsg);
     Serial.println("Cập nhật slot " + String(sensorIndex + 1) + ": INACTIVE");
   }
 }
-
 
 bool isLicensePlate(String msg) {
   return (msg.length() >= 5 && msg.length() <= 10);
